@@ -183,7 +183,6 @@ Image *SwapImage(Image *image) {
     unsigned char *tempin, *tempout;
     int i, size;
     Image *outimage;
-
     outimage = CreateNewImage(image, "#testing Swap");
     tempin = image->data;
     tempout = outimage->data;
@@ -195,7 +194,6 @@ Image *SwapImage(Image *image) {
 
     for (i = 0; i < size; i++) {
         *tempout = *tempin;
-        printf("%c", *tempin);
         tempin++;
         tempout++;
     }
