@@ -1,62 +1,11 @@
-
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include <ctype.h>
-#include "proto.h"
+#include <string.h>
+#include "typedef.h"
+#include "funcdef.h"
 
-void SavePNMImage(Image *, char *);
-Image *SwapImage(Image *);
-Image *ReadPNMImage(char *);
-Image *CreateNewImage(Image *, char *comment);
-int TestReadImage(char *, char *);
-
-int main(int argc, char **argv) {
-    char *input = "..\\images\\bridge.pgm";
-    char *output = "..\\output\\ouput.pgm";
-
-    TestReadImage(input, output);
-
-    return (0);
-}
-
-int TestReadImage(char *filename, char *outfilename) {
-    Image *image;
-    Image *outimage;
-
-    image = ReadPNMImage(filename);
-    outimage = SwapImage(image);
-    SavePNMImage(outimage, outfilename);
-
-    return (0);
-}
-
-Image *SwapImage(Image *image) {
-    unsigned char *tempin, *tempout;
-    int i, size;
-    Image *outimage;
-
-    outimage = CreateNewImage(image, "#testing Swap");
-    tempin = image->data;
-    tempout = outimage->data;
-
-    if (image->Type == GRAY)
-        size = image->Width * image->Height;
-    else if (image->Type == COLOR)
-        size = image->Width * image->Height * 3;
-
-    for (i = 0; i < size; i++) {
-        *tempout = *tempin;
-        tempin++;
-        tempout++;
-    }
-    return (outimage);
-}
-
-/*******************************************************************************
-//Read PPM image and return an image pointer
-**************************************************************************/
 Image *ReadPNMImage(char *filename) {
     char ch;
     int maxval, Width, Height;
@@ -135,9 +84,9 @@ Image *ReadPNMImage(char *filename) {
         exit(0);
     }
 
-    // for(j=0;j<image->num_comment_lines;j++){
-    //       printf("%s\n",image->comments[j]);
-    //       }
+    // for (j = 0; j < image->num_comment_lines; j++) {
+    //     printf("%s\n", image->comments[j]);
+    // }
 
     fclose(fp);
 
@@ -150,48 +99,6 @@ Image *ReadPNMImage(char *filename) {
 
     return (image);
 }
-
-void SavePNMImage(Image *temp_image, char *filename) {
-    int num, j;
-    int size;
-    FILE *fp;
-    // char comment[100];
-
-    printf("Saving Image %s\n", filename);
-    fp = fopen(filename, "w");
-    if (!fp) {
-        printf("cannot open file for writing");
-        exit(0);
-    }
-
-    // strcpy(comment,"#Created by Dr Mohamed N. Ahmed");
-
-    if (temp_image->Type == GRAY) { // Gray (pgm)
-        fprintf(fp, "P5\n");
-        size = temp_image->Width * temp_image->Height;
-    } else if (temp_image->Type == COLOR) { // Color (ppm)
-        fprintf(fp, "P6\n");
-        size = temp_image->Width * temp_image->Height * 3;
-    }
-
-    for (j = 0; j < temp_image->num_comment_lines; j++)
-        fprintf(fp, "%s\n", temp_image->comments[j]);
-
-    fprintf(fp, "%d %d\n%d\n", temp_image->Width, temp_image->Height, 255);
-
-    num = fwrite((void *)temp_image->data, 1, (size_t)size, fp);
-
-    if (num != size) {
-        printf("cannot write image data to file");
-        exit(0);
-    }
-
-    fclose(fp);
-}
-
-/*************************************************************************/
-/*Create a New Image with same dimensions as input image                 */
-/*************************************************************************/
 
 Image *CreateNewImage(Image *image, char *comment) {
     Image *outimage;
@@ -222,6 +129,75 @@ Image *CreateNewImage(Image *image, char *comment) {
     if (!outimage->data) {
         printf("cannot allocate memory for new image");
         exit(0);
+    }
+    return (outimage);
+}
+
+void SavePNMImage(Image *temp_image, char *filename) {
+    int num, j;
+    int size;
+    FILE *fp;
+
+    printf("Saving Image %s\n", filename);
+    fp = fopen(filename, "w");
+    if (!fp) {
+        printf("cannot open file for writing");
+        exit(0);
+    }
+
+    if (temp_image->Type == GRAY) { // Gray (pgm)
+        fprintf(fp, "P5\n");
+        size = temp_image->Width * temp_image->Height;
+    } else if (temp_image->Type == COLOR) { // Color (ppm)
+        fprintf(fp, "P6\n");
+        size = temp_image->Width * temp_image->Height * 3;
+    }
+
+    for (j = 0; j < temp_image->num_comment_lines; j++)
+        fprintf(fp, "%s\n", temp_image->comments[j]);
+
+    fprintf(fp, "%d %d\n%d\n", temp_image->Width, temp_image->Height, 255);
+
+    num = fwrite((void *)temp_image->data, 1, (size_t)size, fp);
+
+    if (num != size) {
+        printf("cannot write image data to file");
+        exit(0);
+    }
+
+    fclose(fp);
+}
+
+int ChangeImage(char *filename, char *outfilename) {
+    Image *image;
+    Image *outimage;
+
+    image = ReadPNMImage(filename);
+    outimage = SwapImage(image);
+    SavePNMImage(outimage, outfilename);
+
+    return (0);
+}
+
+Image *SwapImage(Image *image) {
+    unsigned char *tempin, *tempout;
+    int i, size;
+    Image *outimage;
+
+    outimage = CreateNewImage(image, "#testing Swap");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    if (image->Type == GRAY)
+        size = image->Width * image->Height;
+    else if (image->Type == COLOR)
+        size = image->Width * image->Height * 3;
+
+    for (i = 0; i < size; i++) {
+        *tempout = *tempin;
+        printf("%c", *tempin);
+        tempin++;
+        tempout++;
     }
     return (outimage);
 }
