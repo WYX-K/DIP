@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <string.h>
 #include "typedef.h"
-#include "funcdef.h"
 
 Image *ReadPNMImage(char *filename) {
     char ch;
@@ -168,34 +167,39 @@ void SavePNMImage(Image *temp_image, char *filename) {
     fclose(fp);
 }
 
-int ChangeImage(char *filename, char *outfilename) {
-    Image *image;
-    Image *outimage;
-
-    image = ReadPNMImage(filename);
-    outimage = SwapImage(image);
-    SavePNMImage(outimage, outfilename);
-
-    return (0);
-}
-
-Image *SwapImage(Image *image) {
+Image *AverFilter(Image *image, int number) {
     unsigned char *tempin, *tempout;
-    int i, size;
+    int size;
+    int zero = (number - 1) / 2;
     Image *outimage;
-    outimage = CreateNewImage(image, "#testing Swap");
+    outimage = CreateNewImage(image, "#Average Filter");
     tempin = image->data;
     tempout = outimage->data;
 
-    if (image->Type == GRAY)
-        size = image->Width * image->Height;
-    else if (image->Type == COLOR)
-        size = image->Width * image->Height * 3;
+    int matrixWidth = image->Width + zero;
+    int matrixHeight = image->Height + zero;
 
-    for (i = 0; i < size; i++) {
-        *tempout = *tempin;
-        tempin++;
-        tempout++;
+    int matrix[matrixWidth][matrixHeight];
+    for (int i = 0; i < matrixWidth; i++) {
+        for (int j = 0; j < matrixHeight; j++) {
+            if (i == 0 || j == 0 || i == matrixWidth - 1 || j == matrixHeight - 1) {
+                matrix[i][j] = 0;
+            } else {
+                matrix[i][j] = *tempin;
+                tempin++;
+            }
+        }
     }
+
+    for (int i = number; i < matrixWidth - 1; i++) {
+        for (int j = number; j < matrixHeight - 1; j++) {
+            matrix[i][j] = (matrix[i - 1][j - 1] + matrix[i - 1][j] + matrix[i - 1][j + 1] + matrix[i][j - 1]
+                            + matrix[i][j] + matrix[i][j + 1] + matrix[i + 1][j - 1] + matrix[i + 1][j] + matrix[i + 1][j + 1])
+                           / 9;
+            *tempout = matrix[i][j];
+            tempout++;
+        }
+    }
+
     return (outimage);
 }
