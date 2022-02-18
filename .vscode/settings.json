@@ -1,6 +1,8 @@
 {
   "files.associations": {
     "stdio.h": "c",
-    "typedef.h": "c"
+    "typedef.h": "c",
+    "funcdef.h": "c",
+    "func.h": "c"
   }
 }

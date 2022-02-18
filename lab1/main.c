@@ -1,22 +1,24 @@
 #include <stdio.h>
-#include "funcdef.h"
+#include "func.c"
 
 int main() {
-    char *input = "..\\images\\lena.pgm";
-    char *output = "..\\output\\lena_averFilter_3.pgm";
+    char *input1 = "..\\images\\lena.pgm";
+    char *output1 = "..\\output\\lena_averFilte.pgm";
 
-    ChangeImage(input, output);
+    AverFilter(input1, output1, 3, 3);
+
+    // char *output2 = "..\\output\\lena_midFilter.pgm";
+
+    // MidFilter(input1, output2, 3, 3);
+
+    // char *input2 = "..\\images\\noise.pgm";
+    // char *output3 = "..\\output\\noise_averFilter.pgm";
+
+    // AverFilter(input1, output1, 3, 3);
+
+    // char *output4 = "..\\output\\noise_midFilter.pgm";
+
+    // MidFilter(input1, output2, 3, 3);
 
     return 0;
-}
-
-int ChangeImage(char *filename, char *outfilename) {
-    Image *image;
-    Image *outimage;
-
-    image = ReadPNMImage(filename);
-    outimage = AverFilter(image, 3);
-    SavePNMImage(outimage, outfilename);
-
-    return (0);
 }

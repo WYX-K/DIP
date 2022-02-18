@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "typedef.h"
+#include "funcdef.h"
 
 Image *ReadPNMImage(char *filename) {
     char ch;
@@ -167,39 +168,107 @@ void SavePNMImage(Image *temp_image, char *filename) {
     fclose(fp);
 }
 
-Image *AverFilter(Image *image, int number) {
+int AverFilter(char *filename, char *outfilename, int number1, int number2) {
+    Image *image;
+    Image *outimage;
+
+    image = ReadPNMImage(filename);
+    outimage = AverFilterImage(image, number1, number2);
+    SavePNMImage(outimage, outfilename);
+
+    return (0);
+}
+
+Image *AverFilterImage(Image *image, int number1, int number2) {
     unsigned char *tempin, *tempout;
     int size;
-    int zero = (number - 1) / 2;
+    int zero1 = number1 - 1;
+    int zero2 = number2 - 1;
     Image *outimage;
     outimage = CreateNewImage(image, "#Average Filter");
     tempin = image->data;
     tempout = outimage->data;
 
-    int matrixWidth = image->Width + zero;
-    int matrixHeight = image->Height + zero;
+    int matrixWidth = image->Width + zero1;
+    int matrixHeight = image->Height + zero2;
 
     int matrix[matrixWidth][matrixHeight];
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++) {
-            if (i == 0 || j == 0 || i == matrixWidth - 1 || j == matrixHeight - 1) {
-                matrix[i][j] = 0;
-            } else {
-                matrix[i][j] = *tempin;
-                tempin++;
-            }
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero1 / 2; j++) {
+            matrix[i][j] = *tempin;
+            tempin++;
         }
     }
 
-    for (int i = number; i < matrixWidth - 1; i++) {
-        for (int j = number; j < matrixHeight - 1; j++) {
-            matrix[i][j] = (matrix[i - 1][j - 1] + matrix[i - 1][j] + matrix[i - 1][j + 1] + matrix[i][j - 1]
-                            + matrix[i][j] + matrix[i][j + 1] + matrix[i + 1][j - 1] + matrix[i + 1][j] + matrix[i + 1][j + 1])
-                           / 9;
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero1 / 2; j++) {
+            int res = 0;
+            for (int m = 0; m < number1; m++) {
+                for (int n = 0; n < number2; n++) {
+                    res += matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                }
+            }
+            matrix[i][j] = res / (number1 * number2);
             *tempout = matrix[i][j];
             tempout++;
         }
     }
 
     return (outimage);
+}
+
+int MidFilter(char *filename, char *outfilename, int number1, int number2) {
+    Image *image;
+    Image *outimage;
+
+    image = ReadPNMImage(filename);
+    outimage = MidFilterImage(image, number1, number2);
+    SavePNMImage(outimage, outfilename);
+
+    return (0);
+}
+
+Image *MidFilterImage(Image *image, int number1, int number2) {
+    unsigned char *tempin, *tempout;
+    int size;
+    int zero1 = number1 - 1;
+    int zero2 = number2 - 1;
+    Image *outimage;
+    outimage = CreateNewImage(image, "#Mid Filter");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    int matrixWidth = image->Width + zero1;
+    int matrixHeight = image->Height + zero2;
+
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero1 / 2; j++) {
+            matrix[i][j] = *tempin;
+            tempin++;
+        }
+    }
+
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero1 / 2; j++) {
+            int arry[number1 * number2], k = 0;
+            for (int m = 0; m < number1; m++) {
+                for (int n = 0; n < number2; n++, k++) {
+                    arry[k] = matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                }
+            }
+            qsort(arry, number1 * number2, sizeof(int), cmp);
+            matrix[i][j] = arry[number1 * number2 / 2];
+            *tempout = matrix[i][j];
+            tempout++;
+        }
+    }
+
+    return (outimage);
+}
+
+int cmp(const void *a, const void *b) {
+    return *(int *)a - *(int *)b;
 }
