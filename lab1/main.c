@@ -7,18 +7,18 @@ int main() {
 
     AverFilter(input1, output1, 3, 3);
 
-    // char *output2 = "..\\output\\lena_midFilter.pgm";
+    char *output2 = "..\\output\\lena_midFilter.pgm";
 
-    // MidFilter(input1, output2, 3, 3);
+    MidFilter(input1, output2, 3, 3);
 
-    // char *input2 = "..\\images\\noise.pgm";
-    // char *output3 = "..\\output\\noise_averFilter.pgm";
+    char *input2 = "..\\images\\noise.pgm";
+    char *output3 = "..\\output\\noise_averFilter.pgm";
 
-    // AverFilter(input1, output1, 3, 3);
+    AverFilter(input1, output1, 3, 3);
 
-    // char *output4 = "..\\output\\noise_midFilter.pgm";
+    char *output4 = "..\\output\\noise_midFilter.pgm";
 
-    // MidFilter(input1, output2, 3, 3);
+    MidFilter(input1, output2, 3, 3);
 
     return 0;
 }

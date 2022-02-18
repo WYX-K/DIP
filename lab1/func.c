@@ -139,7 +139,7 @@ void SavePNMImage(Image *temp_image, char *filename) {
     FILE *fp;
 
     printf("Saving Image %s\n", filename);
-    fp = fopen(filename, "w");
+    fp = fopen(filename, "wb");
     if (!fp) {
         printf("cannot open file for writing");
         exit(0);
