@@ -6,6 +6,8 @@
 #include "typedef.h"
 #include "funcdef.h"
 
+int cmp(const void *a, const void *b);
+
 Image *ReadPNMImage(char *filename) {
     char ch;
     int maxval, Width, Height;
