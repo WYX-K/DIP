@@ -7,7 +7,6 @@
 #pragma once
 
 #include "typedef.h"
-#include "func.c"
 /*
     Introduction: Read Image
     Input: Image Path

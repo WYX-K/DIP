@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "funcdef.h"
+#include "func.c"
 
 int main() {
     char *input1 = "..\\images\\lena.pgm";

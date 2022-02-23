@@ -4,6 +4,7 @@
     "typedef.h": "c",
     "funcdef.h": "c",
     "func.h": "c",
-    "ctype.h": "c"
+    "ctype.h": "c",
+    "stdlib.h": "c"
   }
 }
