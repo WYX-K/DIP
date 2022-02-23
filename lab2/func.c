@@ -5,7 +5,6 @@
 #include <math.h>
 #include <string.h>
 #include "typedef.h"
-#include "funcdef.h"
 
 int cmp(const void *a, const void *b);
 

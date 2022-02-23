@@ -2,7 +2,7 @@
  * @Author: WYX
  * @ID: 1930026123
  * @Date: 2022-02-21 18:10:01
- * @LastEditTime: 2022-02-23 10:42:08
+ * @LastEditTime: 2022-02-23 12:20:44
  * @Description: Lab2
  * @FilePath: \lab\lab2\funcdef.h
  */
@@ -11,7 +11,6 @@
 #pragma once
 
 #include "typedef.h"
-
 /**
  * @description: Negative Image
  * @param {Image} *image - Image Pointer
@@ -92,3 +91,5 @@ Image *CreateNewImage(Image *, int height, int width, char *comment);
  * @return {*}
  */
 void SavePNMImage(Image *, char *);
+
+#include "func.c"

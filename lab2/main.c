@@ -2,12 +2,12 @@
  * @Author: WYX
  * @ID: 1930026123
  * @Date: 2022-02-22 18:54:13
- * @LastEditTime: 2022-02-22 22:15:00
+ * @LastEditTime: 2022-02-23 12:12:14
  * @Description: file content
  * @FilePath: \lab\lab2\main.c
  */
 #include <stdio.h>
-#include "func.h"
+#include "funcdef.h"
 
 int main() {
     Image *image;
