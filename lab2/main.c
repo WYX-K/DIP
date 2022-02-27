@@ -2,7 +2,7 @@
  * @Author: WYX
  * @ID: 1930026123
  * @Date: 2022-02-22 18:54:13
- * @LastEditTime: 2022-02-23 12:12:14
+ * @LastEditTime: 2022-02-23 16:54:55
  * @Description: file content
  * @FilePath: \lab\lab2\main.c
  */
@@ -21,7 +21,7 @@ int main() {
     image = ReadPNMImage(input1);
 
     char *output1 = "..\\output\\lena_PixelReplication.pgm";
-    outimage = PixelReplication(image, 0.5);
+    outimage = PixelReplication(image, 2);
     SavePNMImage(outimage, output1);
 
     char *output2 = "..\\output\\lena_NearestNeighbor.pgm";
@@ -29,7 +29,7 @@ int main() {
     SavePNMImage(outimage, output2);
 
     char *output3 = "..\\output\\lena_BilinearInterpolation.pgm";
-    outimage = BilinearInterpolationImage(image, 2);
+    outimage = BilinearInterpolationImage(image, 2.5);
     SavePNMImage(outimage, output3);
 
     char *output4 = "..\\output\\lena_Negative.pgm";
@@ -44,11 +44,11 @@ int main() {
     image = ReadPNMImage(input2);
 
     char *output5 = "..\\output\\bridge_PixelReplication.pgm";
-    outimage = PixelReplication(image, 0.7);
+    outimage = PixelReplication(image, 2);
     SavePNMImage(outimage, output5);
 
     char *output6 = "..\\output\\bridge_NearestNeighbor.pgm";
-    outimage = NearestNeighborImage(image, 1.3);
+    outimage = NearestNeighborImage(image, 2);
     SavePNMImage(outimage, output6);
 
     char *output7 = "..\\output\\bridge_BilinearInterpolation.pgm";

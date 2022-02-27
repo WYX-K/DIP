@@ -12,7 +12,7 @@ Image *NegativeImage(Image *image) {
     unsigned char *tempin, *tempout;
     int size;
     Image *outimage;
-    outimage = CreateNewImage(image, image->Width, image->Height, "#Bilinear Interpolation");
+    outimage = CreateNewImage(image, image->Width, image->Height, "#Negative");
     tempin = image->data;
     tempout = outimage->data;
     // Store existing images into arrays
