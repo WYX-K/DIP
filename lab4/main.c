@@ -2,7 +2,7 @@
  * @Author: WYX
  * @ID: 1930026123
  * @Date: 2022-02-22 18:54:13
- * @LastEditTime: 2022-03-08 22:00:39
+ * @LastEditTime: 2022-03-09 11:06:34
  * @Description: file content
  * @FilePath: \lab\lab2\main.c
  */
@@ -30,7 +30,7 @@ int main() {
     SavePNMImage(outimage, output);
 
     output = "..\\output\\lena_Shear.pgm";
-    outimage = ShearImage(image, 1, 1);
+    outimage = ShearImage(image, 1, 0.1);
     SavePNMImage(outimage, output);
 
     output = "..\\output\\lena_AverFilter_3_3.pgm";

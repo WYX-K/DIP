@@ -43,7 +43,7 @@ Image *ShearImage(Image *image, int type, float number) {
             if (type == 0) {
                 w = j - number * i;
             } else {
-                v = (i - j) / number;
+                v = i - number * j;
             }
             if (w >= 0 && w < matrixWidth && v < matrixHeight && v >= 0) {
                 *tempout = matrix[v][w];
