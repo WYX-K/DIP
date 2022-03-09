@@ -8,9 +8,134 @@
 
 int cmp(const void *a, const void *b);
 
+Image *ShearImage(Image *image, int type, float number) {
+    if (number > 1) {
+        printf("The number must be smaller than 1!");
+        exit(0);
+    }
+    unsigned char *tempin, *tempout;
+    Image *outimage;
+    int newImg_Height = image->Height;
+    int newImg_Width = image->Width;
+    if (type == 0) {
+        newImg_Width += number * 300;
+    } else {
+        newImg_Height += number * 300;
+    }
+    outimage = CreateNewImage(image, newImg_Height, newImg_Width, "#Shear");
+    tempin = image->data;
+    tempout = outimage->data;
+    // Store existing images into arrays
+    int matrixWidth = image->Width;
+    int matrixHeight = image->Height;
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = 0; i < matrixWidth; i++) {
+        for (int j = 0; j < matrixHeight; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    for (int i = 0; i < newImg_Height; i++) {
+        for (int j = 0; j < newImg_Width; j++, tempout++) {
+            int v = i;
+            int w = j;
+            if (type == 0) {
+                w = j - number * i;
+            } else {
+                v = i - number * j;
+            }
+            if (w >= 0 && w < matrixWidth && v < matrixHeight && v >= 0) {
+                *tempout = matrix[v][w];
+            } else {
+                *tempout = 255;
+            }
+        }
+    }
+
+    return (outimage);
+}
+
+Image *RotationImage(Image *image, float theta) {
+    unsigned char *tempin, *tempout;
+    Image *outimage;
+    int newImg_Height = sqrt(pow(image->Height, 2) + pow(image->Width, 2));
+    int newImg_Width = newImg_Height;
+    outimage = CreateNewImage(image, newImg_Height, newImg_Width, "#Rotation");
+    tempin = image->data;
+    tempout = outimage->data;
+    // Store existing images into arrays
+    int matrixWidth = image->Width;
+    int matrixHeight = image->Height;
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = 0; i < matrixWidth; i++) {
+        for (int j = 0; j < matrixHeight; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    int temp_x = (newImg_Height - matrixHeight) / 2;
+    int temp_y = (newImg_Width - matrixWidth) / 2;
+    int x0 = newImg_Height / 2;
+    int y0 = x0;
+    double val = PI / 180.0;
+    for (int i = 0; i < newImg_Height; i++) {
+        for (int j = 0; j < newImg_Width; j++, tempout++) {
+            int v = (i - x0) * cos(theta * val) + (j - y0) * sin(theta * val) + x0 - temp_x;
+            int w = (j - y0) * cos(theta * val) - (i - x0) * sin(theta * val) + x0 - temp_y;
+            if (w >= 0 && w < matrixWidth && v < matrixHeight && v >= 0) {
+                *tempout = matrix[v][w];
+            } else {
+                *tempout = 255;
+            }
+        }
+    }
+
+    return (outimage);
+}
+
+Image *TranslationImage(Image *image, int x_number, int y_number) {
+    unsigned char *tempin, *tempout;
+    Image *outimage;
+    int newImg_Height = image->Height + abs(y_number);
+    int newImg_Width = image->Width + abs(x_number);
+    outimage = CreateNewImage(image, newImg_Height, newImg_Width, "#Translation");
+    tempin = image->data;
+    tempout = outimage->data;
+    // Store existing images into arrays
+    int matrixWidth = image->Width;
+    int matrixHeight = image->Height;
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = 0; i < matrixWidth; i++) {
+        for (int j = 0; j < matrixHeight; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    for (int i = 0; i < newImg_Height; i++) {
+        for (int j = 0; j < newImg_Width; j++, tempout++) {
+            int x = i, y = j;
+            if (y_number >= 0) {
+                x = i - y_number;
+            }
+            if (x_number >= 0) {
+                y = j - x_number;
+            }
+            if (x >= 0 && y >= 0 && x < matrixHeight && y < matrixWidth) {
+                *tempout = matrix[x][y];
+            } else {
+                *tempout = 255;
+            }
+        }
+    }
+
+    return (outimage);
+}
+
 Image *NegativeImage(Image *image) {
     unsigned char *tempin, *tempout;
-    int size;
     Image *outimage;
     outimage = CreateNewImage(image, image->Width, image->Height, "#Negative");
     tempin = image->data;
@@ -27,7 +152,7 @@ Image *NegativeImage(Image *image) {
     }
 
     for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixWidth; j++, tempout++) {
+        for (int j = 0; j < matrixHeight; j++, tempout++) {
             *tempout = 255 - matrix[i][j];
         }
     }
@@ -37,7 +162,6 @@ Image *NegativeImage(Image *image) {
 
 Image *BilinearInterpolationImage(Image *image, float number) {
     unsigned char *tempin, *tempout;
-    int size;
     Image *outimage;
     int newImg_Height = image->Height * number;
     int newImg_width = image->Width * number;
@@ -83,7 +207,6 @@ Image *BilinearInterpolationImage(Image *image, float number) {
 
 Image *NearestNeighborImage(Image *image, float number) {
     unsigned char *tempin, *tempout;
-    int size;
     Image *outimage;
     int newImg_Height = image->Height * number;
     int newImg_width = image->Width * number;
@@ -119,9 +242,8 @@ Image *NearestNeighborImage(Image *image, float number) {
     return (outimage);
 }
 
-Image *PixelReplication(Image *image, float number) {
+Image *PixelReplicationImage(Image *image, float number) {
     unsigned char *tempin, *tempout;
-    int size;
     Image *outimage;
     int newImg_Height = image->Height * number;
     int newImg_width = image->Width * number;
@@ -321,7 +443,6 @@ void SavePNMImage(Image *temp_image, char *filename) {
 
 Image *AverFilterImage(Image *image, int number1, int number2) {
     unsigned char *tempin, *tempout;
-    int size;
     int zero1 = number1 - 1;
     int zero2 = number2 - 1;
     Image *outimage;
@@ -360,7 +481,6 @@ Image *AverFilterImage(Image *image, int number1, int number2) {
 
 Image *MidFilterImage(Image *image, int number1, int number2) {
     unsigned char *tempin, *tempout;
-    int size;
     int zero1 = number1 - 1;
     int zero2 = number2 - 1;
     Image *outimage;

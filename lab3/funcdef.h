@@ -1,16 +1,49 @@
 /*
  * @Author: WYX
  * @ID: 1930026123
- * @Date: 2022-02-21 18:10:01
- * @LastEditTime: 2022-02-23 12:20:44
- * @Description: Lab2
- * @FilePath: \lab\lab2\funcdef.h
+ * @Date: 2022-03-08 14:42:43
+ * @LastEditTime: 2022-03-08 21:00:55
  */
 
 #pragma once
 #pragma once
 
 #include "typedef.h"
+
+/**
+ * @description: Shear Image
+ * @param {Image} *image - Image Pointer
+ * @param {float} number - shear number
+ * @param {float} type - shear type(0: vertical; 1: horizontal)
+ * @return {*} Image Pointer
+ */
+Image *ShearImage(Image *image, int type, float number);
+
+/**
+ * @description: Rotation Image
+ * @param {Image} *image - Image Pointer
+ * @param {float} theta - roatation angle
+ * @return {*} Image Pointer
+ */
+Image *RotationImage(Image *image, float theta);
+
+/**
+ * @description: Rotation Image
+ * @param {Image} *image - Image Pointer
+ * @param {float} theta - roatation angle
+ * @return {*} Image Pointer
+ */
+Image *RotationImage(Image *image, float theta);
+
+/**
+ * @description: Translation Image
+ * @param {Image} *image - Image Pointer
+ * @param {int} x_number - x axis translation
+ * @param {int} y_number - y axis translation
+ * @return {*} Image Pointer
+ */
+Image *TranslationImage(Image *image, int x_number, int y_number);
+
 /**
  * @description: Negative Image
  * @param {Image} *image - Image Pointer

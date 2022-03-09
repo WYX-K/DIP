@@ -2,7 +2,7 @@
  * @Author: WYX
  * @ID: 1930026123
  * @Date: 2022-02-22 18:54:13
- * @LastEditTime: 2022-02-23 16:54:55
+ * @LastEditTime: 2022-03-09 11:06:34
  * @Description: file content
  * @FilePath: \lab\lab2\main.c
  */
@@ -12,52 +12,42 @@
 int main() {
     Image *image;
     Image *outimage;
+    char *input, *output;
     /*
      *
      * lena.pgm
      *
      */
-    char *input1 = "..\\images\\lena.pgm";
-    image = ReadPNMImage(input1);
+    input = "..\\images\\lena.pgm";
+    image = ReadPNMImage(input);
 
-    char *output1 = "..\\output\\lena_PixelReplication.pgm";
-    outimage = PixelReplication(image, 2);
-    SavePNMImage(outimage, output1);
+    output = "..\\output\\lena_Translation.pgm";
+    outimage = TranslationImage(image, 100, 100);
+    SavePNMImage(outimage, output);
 
-    char *output2 = "..\\output\\lena_NearestNeighbor.pgm";
-    outimage = NearestNeighborImage(image, 2);
-    SavePNMImage(outimage, output2);
+    output = "..\\output\\lena_Rotation.pgm";
+    outimage = RotationImage(image, 45);
+    SavePNMImage(outimage, output);
 
-    char *output3 = "..\\output\\lena_BilinearInterpolation.pgm";
-    outimage = BilinearInterpolationImage(image, 2.5);
-    SavePNMImage(outimage, output3);
+    output = "..\\output\\lena_Shear.pgm";
+    outimage = ShearImage(image, 1, 0.1);
+    SavePNMImage(outimage, output);
 
-    char *output4 = "..\\output\\lena_Negative.pgm";
-    outimage = NegativeImage(image);
-    SavePNMImage(outimage, output4);
-    /*
-     *
-     * bridge.pgm
-     *
-     */
-    char *input2 = "..\\images\\bridge.pgm";
-    image = ReadPNMImage(input2);
+    output = "..\\output\\lena_AverFilter_3_3.pgm";
+    outimage = AverFilterImage(image, 3, 3);
+    SavePNMImage(outimage, output);
 
-    char *output5 = "..\\output\\bridge_PixelReplication.pgm";
-    outimage = PixelReplication(image, 2);
-    SavePNMImage(outimage, output5);
+    output = "..\\output\\lena_AverFilter_5_5.pgm";
+    outimage = AverFilterImage(image, 5, 5);
+    SavePNMImage(outimage, output);
 
-    char *output6 = "..\\output\\bridge_NearestNeighbor.pgm";
-    outimage = NearestNeighborImage(image, 2);
-    SavePNMImage(outimage, output6);
+    output = "..\\output\\lena_MidFilter_3_3.pgm";
+    outimage = MidFilterImage(image, 3, 3);
+    SavePNMImage(outimage, output);
 
-    char *output7 = "..\\output\\bridge_BilinearInterpolation.pgm";
-    outimage = BilinearInterpolationImage(image, 2.5);
-    SavePNMImage(outimage, output7);
-
-    char *output8 = "..\\output\\bridge_Negative.pgm";
-    outimage = NegativeImage(image);
-    SavePNMImage(outimage, output8);
+    output = "..\\output\\lena_MidFilter_5_5.pgm";
+    outimage = MidFilterImage(image, 5, 5);
+    SavePNMImage(outimage, output);
 
     return 0;
 }

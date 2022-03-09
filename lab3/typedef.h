@@ -1,9 +1,16 @@
+/*
+ * @Author: WYX
+ * @ID: 1930026123
+ * @Date: 2022-03-08 14:42:43
+ * @LastEditTime: 2022-03-08 20:34:35
+ * @Description: file content
+ */
 #pragma once
 #pragma once
 
 #define GRAY 1
 #define COLOR 2
-
+#define PI 3.14159265
 typedef struct Image {
     int Width;
     int Height;
