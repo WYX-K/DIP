@@ -2,7 +2,7 @@
  * @Author: WYX
  * @ID: 1930026123
  * @Date: 2022-02-22 18:54:13
- * @LastEditTime: 2022-03-09 13:24:03
+ * @LastEditTime: 2022-03-09 13:33:26
  * @Description: file content
  * @FilePath: \lab\lab2\main.c
  */
