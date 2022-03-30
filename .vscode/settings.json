@@ -5,6 +5,10 @@
     "funcdef.h": "c",
     "func.h": "c",
     "ctype.h": "c",
-    "stdlib.h": "c"
-  }
+    "stdlib.h": "c",
+    "malloc.h": "c",
+    "math.h": "c",
+    "string.h": "c"
+  },
+  "C_Cpp.errorSquiggles": "Disabled"
 }
