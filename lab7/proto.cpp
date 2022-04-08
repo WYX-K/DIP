@@ -103,7 +103,6 @@ void SavePNMImage(Image *temp_image, char *filename) {
         printf("cannot open file for writing");
         exit(0);
     }
-
     if (temp_image->Type == GRAY) { // Gray (pgm)
         fprintf(fp, "P5\n");
         size = temp_image->Width * temp_image->Height;

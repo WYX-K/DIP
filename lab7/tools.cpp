@@ -1,3 +1,91 @@
+Image *Bandreject(Image *image, float w, float c) {
+    unsigned char *tempin, *tempout;
+    Image *inimage, *outimage;
+
+    inimage = ZeroPadding(image);
+
+    tempin = inimage->data;
+    int size = inimage->Height * inimage->Width;
+    int width = inimage->Width, height = inimage->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * inimage->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    // for (int i = 0; i < height; i++) {
+    //     for (int j = 0; j < width; j++) {
+    //         double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+    //         double p = -pow((pow(des, 2) - pow(c, 2)) / (des * w), 2);
+    //         src[i * width + j].x *= (1 - exp(p));
+    //     }
+    // }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
+
+    return (outimage);
+}
+
+Image *Homomorphic(Image *image, float radius, float gamma1, float gamma2, float c) {
+    Image *inimage, *outimage;
+
+    inimage = ZeroPadding(image);
+    int size = inimage->Height * inimage->Width;
+    int width = inimage->Width, height = inimage->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        if (inimage->data[i] == 0) {
+            src[i].x = 0.0;
+        } else {
+            src[i].x = 1.0 * log(inimage->data[i]);
+        }
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            double p = -c * pow(des / radius, 2);
+            src[i * width + j].x *= (gamma1 - gamma2) * (1 - exp(p)) + gamma2;
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#Homomorphic img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = exp(src[i].x);
+    }
+
+    return (outimage);
+}
+
 Image *BHPF_T(Image *image, float radius, float rank) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;
@@ -177,11 +265,15 @@ Image *ZeroPadding(Image *image) {
     int newHeight = image->Height * 2;
 
     outimage = CreateNewImage(image, newHeight, newWidth, (char *)"#temp img");
+
     tempin = image->data;
     tempout = outimage->data;
 
-    int matrix[matrixHeight][matrixWidth];
-    memset(matrix, 0, sizeof(matrix));
+    int **matrix = new int *[matrixWidth];
+    for (int i = 0; i < matrixWidth; i++) {
+        matrix[i] = new int[matrixHeight];
+    }
+
     for (int i = 0; i < matrixHeight; i++) {
         for (int j = 0; j < matrixWidth; j++, tempin++) {
             matrix[i][j] = *tempin;
@@ -203,16 +295,15 @@ Image *ZeroPadding(Image *image) {
 
 Image *RemoveZeros(Image *image) {
     int matrixWidth = image->Width, matrixHeight = image->Height;
-
     Image *outimage = CreateNewImage(image, image->Height / 2, image->Width / 2, (char *)"#BLPF Image");
     unsigned char *tempout;
     tempout = outimage->data;
     unsigned char *tempin;
     tempin = image->data;
-
-    int matrix[matrixHeight][matrixWidth];
-
-    memset(matrix, 0, sizeof(matrix));
+    int **matrix = new int *[matrixWidth];
+    for (int i = 0; i < matrixWidth; i++) {
+        matrix[i] = new int[matrixHeight];
+    }
     for (int i = 0; i < matrixHeight; i++) {
         for (int j = 0; j < matrixWidth; j++, tempin++) {
             matrix[i][j] = *tempin;

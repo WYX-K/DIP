@@ -1,3 +1,23 @@
+Image *BandrejectImage(Image *image, float w, float c) {
+    unsigned char *tempin, *tempout;
+    Image *inimage, *outimage;
+    inimage = Bandreject(image, w, c);
+
+    outimage = RemoveZeros(inimage);
+
+    return (outimage);
+}
+
+Image *HomomorphicImage(Image *image, float radius, float gamma1, float gamma2, float c) {
+    unsigned char *tempin, *tempout;
+    Image *inimage, *outimage;
+
+    inimage = Homomorphic(image, radius, gamma1, gamma2, c);
+    outimage = RemoveZeros(inimage);
+
+    return (outimage);
+}
+
 Image *BHPF_TImage(Image *image, float radius, float rank) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;

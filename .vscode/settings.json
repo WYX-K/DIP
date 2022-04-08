@@ -8,7 +8,8 @@
     "stdlib.h": "c",
     "malloc.h": "c",
     "math.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "cmath": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

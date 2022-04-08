@@ -21,7 +21,9 @@ Image *ILPF(Image *image, float radius);
 Image *BLPF(Image *image, float radius, float rank);
 Image *GLPF(Image *image, float radius);
 Image *BHPF_T(Image *image, float radius);
+Image *Bandreject(Image *image, float w, float c);
 Image *CreateNewImage(Image *, int height, int width, char *comment);
 Image *RemoveZeros(Image *image);
+Image *Homomorphic(Image *image, float radius, float gamma1, float gamma2, float c);
 
 #include "tools.cpp"

@@ -14,46 +14,25 @@ int main() {
     Image *outimage;
     char *input, *output;
 
-    input = (char *)"..\\images\\lena.pgm";
+    // input = (char *)"..\\images\\bridge.pgm";
+    // image = ReadPNMImage(input);
+
+    // output = (char *)"..\\output\\bridge_Homomorphic.pgm";
+    // outimage = HomomorphicImage(image, 20, 1, 0.5, 5);
+    // SavePNMImage(outimage, output);
+
+    // input = (char *)"..\\images\\goldhill.pgm";
+    // image = ReadPNMImage(input);
+
+    // output = (char *)"..\\output\\goldhill_Homomorphic.pgm";
+    // outimage = HomomorphicImage(image, 20, 1, 0.5, 5);
+    // SavePNMImage(outimage, output);
+
+    input = (char *)"..\\images\\LenaWithNoise.pgm";
     image = ReadPNMImage(input);
 
-    output = (char *)"..\\output\\lena_ILPF.pgm";
-    outimage = ILPFImage(image, 10);
-    SavePNMImage(outimage, output);
-
-    output = (char *)"..\\output\\lena_BLPF.pgm";
-    outimage = BLPFImage(image, 10, 3);
-    SavePNMImage(outimage, output);
-
-    output = (char *)"..\\output\\lena_GLPF.pgm";
-    outimage = GLPFImage(image, 10);
-    SavePNMImage(outimage, output);
-
-    input = (char *)"..\\images\\camera.pgm";
-    image = ReadPNMImage(input);
-
-    output = (char *)"..\\output\\camera_ILPF.pgm";
-    outimage = ILPFImage(image, 10);
-    SavePNMImage(outimage, output);
-
-    output = (char *)"..\\output\\camera_BLPF.pgm";
-    outimage = BLPFImage(image, 10, 3);
-    SavePNMImage(outimage, output);
-
-    output = (char *)"..\\output\\camera_GLPF.pgm";
-    outimage = GLPFImage(image, 10);
-    SavePNMImage(outimage, output);
-
-    input = (char *)"..\\images\\fingerprint1.pgm";
-    image = ReadPNMImage(input);
-    output = (char *)"..\\output\\fingerprint1_BHPF_T.pgm";
-    outimage = BHPF_TImage(image, 25, 4);
-    SavePNMImage(outimage, output);
-
-    input = (char *)"..\\images\\fingerprint2.pgm";
-    image = ReadPNMImage(input);
-    output = (char *)"..\\output\\fingerprint2_BHPF.pgm";
-    outimage = BHPF_TImage(image, 25, 4);
+    output = (char *)"..\\output\\LenaWithNoise_Bandreject.pgm";
+    outimage = BandrejectImage(image, 10, 100);
 
     SavePNMImage(outimage, output);
 

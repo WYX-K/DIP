@@ -6,7 +6,6 @@
  */
 
 #pragma once
-#pragma once
 
 #include <stdio.h>
 #include <malloc.h>
@@ -16,6 +15,26 @@
 #include <math.h>
 #include "typedef.h"
 #include "tools.h"
+
+/**
+ * @description: Use Bandreject to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {float} w - Bandwidth
+ * @param {float} c - Cut-off frequency
+ * @return {Image} Image Pointer
+ */
+Image *BandrejectImage(Image *image, float w, float c);
+
+/**
+ * @description: Use Homomorphic to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {float} radius - Cut-off frequency
+ * @param {float} gamma1 - gamma1 of the filter
+ * @param {float} gamma2 - gamma2 of the filter
+ * @param {float} c - c of the filter
+ * @return {Image} Image Pointer
+ */
+Image *HomomorphicImage(Image *image, float radius, float gamma1, float gamma2, float c);
 
 /**
  * @description: Use BHPF_TImage to get the image

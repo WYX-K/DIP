@@ -60,7 +60,7 @@ Image *GLPF(Image *image, float radius) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
-            double p = -1 / 2 * pow(des / radius, 2);
+            double p = -(double)(1 / 2) * pow(des / radius, 2);
             src[i * width + j].x *= exp(p);
         }
     }
