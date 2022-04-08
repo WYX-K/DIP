@@ -17,6 +17,36 @@
 #include "tools.h"
 
 /**
+ * @description: Use adaptive median filter to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {int} number1 - Filter kernel
+ * @param {int} number2 - Filter kernel
+ * @param {int} smax - the max size of filter size
+ * @return {Image} Image Pointer
+ */
+Image *AdMedFilterImage(Image *image, int number1, int number2, int smax);
+
+/**
+ * @description: Use Alpha Trimmed Mean to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {int} number1 - Filter kernel
+ * @param {int} number2 - Filter kernel
+ * @param {int} d
+ * @return {Image} Image Pointer
+ */
+
+Image *AlphaTrimmedMeanImage(Image *image, int number1, int number2, int d);
+
+/**
+ * @description: Use Geo Filter to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {int} number1 - Filter kernel
+ * @param {int} number2 - Filter kernel
+ * @return {Image} Image Pointer
+ */
+Image *GeoFilterImage(Image *image, int number1, int number2);
+
+/**
  * @description: Use Bandreject to get the image
  * @param {Image} *image - Image Pointer
  * @param {float} w - Bandwidth

@@ -1,3 +1,137 @@
+Image *AdMedFilterImage(Image *image, int number1, int number2, int smax) {
+    unsigned char *tempin, *tempout;
+    int zero1 = number1 - 1;
+    int zero2 = number2 - 1;
+
+    Image *outimage;
+    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Mid Filter");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    int matrixWidth = image->Width + zero1;
+    int matrixHeight = image->Height + zero2;
+
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++) {
+            matrix[i][j] = *tempin;
+            tempin++;
+        }
+    }
+
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempout++) {
+            int size = number1 * number2;
+            while (size <= smax) {
+                int arry[number1 * number2], k = 0;
+                for (int m = 0; m < number1; m++) {
+                    for (int n = 0; n < number2; n++, k++) {
+                        arry[k] = matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                    }
+                }
+                qsort(arry, number1 * number2, sizeof(int), cmp);
+                int zmin = arry[0];
+                int zmax = arry[number1 * number2 - 1];
+                int zmed = arry[number1 * number2 / 2];
+                int z = matrix[i][j];
+                int a1 = zmed - zmin;
+                int a2 = zmed - zmax;
+                if (a1 > 0 && a2 < 0) {
+                    int b1 = z - zmin, b2 = z - zmax;
+                    if (b1 > 0 && b2 < 0) {
+                        *tempout = z;
+                    } else {
+                        *tempout = zmed;
+                    }
+                    break;
+                } else {
+                    size = (number1++) * (number2++);
+                    if (size > smax) {
+                        *tempout = zmed;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    return (outimage);
+}
+
+Image *AlphaTrimmedMeanImage(Image *image, int number1, int number2, int d) {
+    unsigned char *tempin, *tempout;
+    int zero1 = number1 - 1;
+    int zero2 = number2 - 1;
+    Image *outimage;
+    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Alpha Trimmed Mean Filter");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    int matrixWidth = image->Width + zero1;
+    int matrixHeight = image->Height + zero2;
+
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 1, sizeof(matrix));
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++) {
+            int res = 0;
+            for (int m = 0; m < number1; m++) {
+                for (int n = 0; n < number2; n++) {
+                    res += matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                }
+            }
+            *tempout = res / (number1 * number2 - d);
+            tempout++;
+        }
+    }
+
+    return (outimage);
+}
+
+Image *GeoFilterImage(Image *image, int number1, int number2) {
+    unsigned char *tempin, *tempout;
+    int zero1 = number1 - 1;
+    int zero2 = number2 - 1;
+    Image *outimage;
+    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#GeoFilter Filter");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    int matrixWidth = image->Width + zero1;
+    int matrixHeight = image->Height + zero2;
+
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 1, sizeof(matrix));
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
+        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempout++) {
+            int temp = 0;
+            double res = 1;
+            for (int m = 0; m < number1; m++) {
+                for (int n = 0; n < number2; n++) {
+                    temp = (unsigned char)matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                    res *= pow(temp, 1.0 / (number1 * number2));
+                }
+            }
+            *tempout = res;
+        }
+    }
+
+    return (outimage);
+}
+
 Image *BandrejectImage(Image *image, float w, float c) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;
