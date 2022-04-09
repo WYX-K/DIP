@@ -10,7 +10,7 @@ unsigned char *Normal(double *arr_in, int size, int range) {
     }
 
     for (i = 0; i < size; ++i)
-        arr_out[i] = (int)((arr_in[i] - min) / (max - min) * range);
+        arr_out[i] = (int)log(((arr_in[i] - min) / (max - min) * range) + 1) * 20;
     return arr_out;
 }
 
@@ -99,7 +99,7 @@ double *getResult(struct _complex *src, int size) {
     double *res = (double *)malloc(sizeof(double) * size);
 
     for (i = 0; i < size; ++i)
-        res[i] = sqrt(src[i].x * src[i].x + src[i].y * src[i].y);
+        res[i] = 1 + sqrt(src[i].x * src[i].x + src[i].y * src[i].y);
 
     return res;
 }

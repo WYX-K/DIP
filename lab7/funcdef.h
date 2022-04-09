@@ -21,6 +21,13 @@
  * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
+Image *FFTImage(Image *image);
+
+/**
+ * @description: Add zero padding
+ * @param {Image} *image - Image Pointer
+ * @return {Image} Image Pointer
+ */
 Image *ZeroPadding(Image *image);
 
 /**

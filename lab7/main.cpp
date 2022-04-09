@@ -30,15 +30,15 @@ int main() {
     // outimage = HomomorphicImage(image, 20, 4, 0.5, 5);
     // SavePNMImage(outimage, output);
 
-    input = (char *)"..\\images\\Lena.pgm";
-    image = ReadPNMImage(input);
+    // input = (char *)"..\\images\\Lena.pgm";
+    // image = ReadPNMImage(input);
 
-    output = (char *)"..\\output\\Lena_Bandreject.pgm";
-    outimage = ZeroPadding(image);
-    outimage = AddSinNoiseImage(outimage, 5);
-    outimage = BandrejectImage(outimage, 300, 50);
-    outimage = RemoveZeros(outimage);
-    SavePNMImage(outimage, output);
+    // output = (char *)"..\\output\\Lena_Bandreject.pgm";
+    // outimage = ZeroPadding(image);
+    // outimage = AddSinNoiseImage(outimage, 5);
+    // outimage = BandrejectImage(outimage, 300, 50);
+    // outimage = RemoveZeros(outimage);
+    // SavePNMImage(outimage, output);
 
     // input = (char *)"..\\images\\cameraWithNoise.pgm";
     // image = ReadPNMImage(input);
@@ -47,15 +47,15 @@ int main() {
     // outimage = AdMedFilterImage(image, 3, 9);
     // SavePNMImage(outimage, output);
 
-    // input = (char *)"..\\images\\LenaWithNoise.pgm";
-    // image = ReadPNMImage(input);
+    input = (char *)"..\\images\\LenaWithNoise.pgm";
+    image = ReadPNMImage(input);
 
-    // output = (char *)"..\\output\\LenaWithNoise_Bandreject.pgm";
-    // image = ZeroPadding(image);
-    // // image = FFTImage(image, 1);
-    // image = BandrejectImage(image, 300, 50);
-    // outimage = RemoveZeros(image);
-    // SavePNMImage(outimage, output);
+    output = (char *)"..\\output\\LenaWithNoise_FFT.pgm";
+    outimage = ZeroPadding(image);
+    // outimage = FFTImage(outimage);
+    outimage = BandrejectImage(outimage, 60, 10);
+    outimage = RemoveZeros(outimage);
+    SavePNMImage(outimage, output);
 
     // //    **********************************************************************
 

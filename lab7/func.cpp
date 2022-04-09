@@ -242,26 +242,20 @@ Image *BandrejectImage(Image *image, float w, float c) {
 
     fft(src, src, 1, height, width);
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
-            double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
-            // printf("%lf\n", 1 - exp(p));
-            src[i * width + j].x *= (double)(1 - exp(p));
-        }
-    }
+    // for (int i = 0; i < height; i++) {
+    //     for (int j = 0; j < width; j++) {
+    //         double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+    //         double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
+    //         // printf("%lf\n", 1 - exp(p));
+    //         src[i * width + j].x *= (double)(1 - exp(p));
+    //     }
+    // }
 
     fft(src, src, -1, height, width);
 
     outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
 
     for (int i = 0; i < size; i++) {
-        if (src[i].x > 255) {
-            src[i].x = 255;
-        }
-        if (src[i].x < 0) {
-            src[i].x = 0;
-        }
         outimage->data[i] = src[i].x;
     }
 
@@ -474,7 +468,7 @@ Image *ILPFImage(Image *image, float radius) {
     return (outimage);
 }
 
-Image *FFTImage(Image *image, int flag) {
+Image *FFTImage(Image *image) {
     int size = image->Height * image->Width;
     struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
 
