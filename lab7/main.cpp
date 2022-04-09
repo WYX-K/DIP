@@ -47,15 +47,15 @@ int main() {
     // outimage = AdMedFilterImage(image, 3, 9);
     // SavePNMImage(outimage, output);
 
-    input = (char *)"..\\images\\LenaWithNoise.pgm";
-    image = ReadPNMImage(input);
+    // input = (char *)"..\\images\\LenaWithNoise.pgm";
+    // image = ReadPNMImage(input);
 
-    output = (char *)"..\\output\\LenaWithNoise_FFT.pgm";
+    // output = (char *)"..\\output\\LenaWithNoise_Bandreject.pgm";
     // outimage = ZeroPadding(image);
-    // outimage = FFTImage(outimage);
-    outimage = BandrejectImage(image, 60, 10);
+    // outimage = FFTImage(image);
+    // outimage = ChangeFImage(outimage, 334, 67);
     // outimage = RemoveZeros(outimage);
-    SavePNMImage(outimage, output);
+    // SavePNMImage(outimage, output);
 
     // **********************************************************************
 

@@ -232,7 +232,6 @@ Image *BandrejectImage(Image *image, float w, float c) {
 
     int size = image->Height * image->Width;
     int width = image->Width, height = image->Height;
-
     struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
 
     for (int i = 0; i < size; ++i) {
@@ -242,14 +241,14 @@ Image *BandrejectImage(Image *image, float w, float c) {
 
     fft(src, src, 1, height, width);
 
-    // for (int i = 0; i < height; i++) {
-    //     for (int j = 0; j < width; j++) {
-    //         double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
-    //         double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
-    //         // printf("%lf\n", 1 - exp(p));
-    //         src[i * width + j].x *= (double)(1 - exp(p));
-    //     }
-    // }
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
+            // printf("%lf\n", 1 - exp(p));
+            src[i * width + j].x *= (double)(1 - exp(p));
+        }
+    }
 
     fft(src, src, -1, height, width);
 
