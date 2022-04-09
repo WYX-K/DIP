@@ -16,7 +16,7 @@ unsigned char *Normal(double *arr_in, int size, int range) {
 
 void fft(struct _complex *src, struct _complex *dst, int flag, int height, int width) {
     int y, x, i, u, k, n;
-    int NUM_y = height, NUM_x = width;
+    int NUM_y = 486, NUM_x = 486;
     double wu;
     struct _complex w, a0, a1, t;
     clock_t start, end;

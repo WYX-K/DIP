@@ -51,13 +51,13 @@ int main() {
     image = ReadPNMImage(input);
 
     output = (char *)"..\\output\\LenaWithNoise_FFT.pgm";
-    outimage = ZeroPadding(image);
+    // outimage = ZeroPadding(image);
     // outimage = FFTImage(outimage);
-    outimage = BandrejectImage(outimage, 60, 10);
-    outimage = RemoveZeros(outimage);
+    outimage = BandrejectImage(image, 60, 10);
+    // outimage = RemoveZeros(outimage);
     SavePNMImage(outimage, output);
 
-    // //    **********************************************************************
+    // **********************************************************************
 
     // input = (char *)"..\\images\\lenaD1.pgm";
     // image = ReadPNMImage(input);
