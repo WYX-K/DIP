@@ -17,14 +17,27 @@
 #include "tools.h"
 
 /**
- * @description: Use adaptive median filter to get the image
+ * @description: Add zero padding
  * @param {Image} *image - Image Pointer
- * @param {int} number1 - Filter kernel
- * @param {int} number2 - Filter kernel
- * @param {int} smax - the max size of filter size
  * @return {Image} Image Pointer
  */
-Image *AdMedFilterImage(Image *image, int number1, int number2, int smax);
+Image *ZeroPadding(Image *image);
+
+/**
+ * @description: Remove zero padding
+ * @param {Image} *image - Image Pointer
+ * @return {Image} Image Pointer
+ */
+Image *RemoveZeros(Image *image);
+
+/**
+ * @description: Use adaptive median filter to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {int} n - origin window size
+ * @param {int} smax - max window size
+ * @return {Image} Image Pointer
+ */
+Image *AdMedFilterImage(Image *image, int n, int smax);
 
 /**
  * @description: Use Alpha Trimmed Mean to get the image
@@ -54,6 +67,14 @@ Image *GeoFilterImage(Image *image, int number1, int number2);
  * @return {Image} Image Pointer
  */
 Image *BandrejectImage(Image *image, float w, float c);
+
+/**
+ * @description: Use Add Sin Noise to get the image
+ * @param {Image} *image - Image Pointer
+ * @param {float} sigma
+ * @return {Image} Image Pointer
+ */
+Image *AddSinNoise(Image *image, float sigma);
 
 /**
  * @description: Use Homomorphic to get the image

@@ -1,60 +1,138 @@
-Image *AdMedFilterImage(Image *image, int number1, int number2, int smax) {
+Image *ZeroPadding(Image *image) {
     unsigned char *tempin, *tempout;
-    int zero1 = number1 - 1;
-    int zero2 = number2 - 1;
-
     Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Mid Filter");
+    int matrixWidth = image->Width;
+    int matrixHeight = image->Height;
+    int newWidth = image->Width * 2;
+    int newHeight = image->Height * 2;
+
+    outimage = CreateNewImage(image, newHeight, newWidth, (char *)"#temp img");
+
     tempin = image->data;
     tempout = outimage->data;
 
-    int matrixWidth = image->Width + zero1;
-    int matrixHeight = image->Height + zero2;
+    int **matrix = new int *[matrixWidth];
+    for (int i = 0; i < matrixWidth; i++) {
+        matrix[i] = new int[matrixHeight];
+    }
 
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
-        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++) {
+    for (int i = 0; i < matrixHeight; i++) {
+        for (int j = 0; j < matrixWidth; j++, tempin++) {
             matrix[i][j] = *tempin;
-            tempin++;
         }
     }
 
-    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
-        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempout++) {
-            int size = number1 * number2;
+    for (int i = 0; i < newHeight; i++) {
+        for (int j = 0; j < newWidth; j++, tempout++) {
+            if (i < matrixHeight && j < matrixWidth) {
+                *tempout = matrix[i][j];
+            } else {
+                *tempout = 0;
+            }
+        }
+    }
+
+    return (outimage);
+}
+
+Image *RemoveZeros(Image *image) {
+    int matrixWidth = image->Width, matrixHeight = image->Height;
+    Image *outimage = CreateNewImage(image, image->Height / 2, image->Width / 2, (char *)"#BLPF Image");
+    unsigned char *tempout;
+    tempout = outimage->data;
+    unsigned char *tempin;
+    tempin = image->data;
+    int **matrix = new int *[matrixWidth];
+    for (int i = 0; i < matrixWidth; i++) {
+        matrix[i] = new int[matrixHeight];
+    }
+    for (int i = 0; i < matrixHeight; i++) {
+        for (int j = 0; j < matrixWidth; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    for (int i = 0; i < matrixHeight / 2; i++) {
+        for (int j = 0; j < image->Width / 2; j++, tempout++) {
+            *tempout = matrix[i][j];
+        }
+    }
+
+    return outimage;
+}
+
+Image *AdMedFilterImage(Image *image, int n, int smax) {
+    unsigned char *tempin, *tempout;
+
+    Image *outimage;
+    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#AdMedFilter Filter");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    int matrixWidth = image->Width;
+    int matrixHeight = image->Height;
+
+    memcpy(tempout, tempin, matrixWidth * matrixHeight);
+
+    int matrix[matrixWidth][matrixHeight];
+    memset(matrix, 0, sizeof(matrix));
+    for (int i = 0; i < matrixWidth; i++) {
+        for (int j = 0; j < matrixHeight; j++, tempin++) {
+            matrix[i][j] = *tempin;
+        }
+    }
+
+    int pos = (smax - 1) / 2;
+    for (int i = pos; i < matrixWidth - pos; i++) {
+        for (int j = pos; j < matrixHeight - pos; j++) {
+            int size = n;
             while (size <= smax) {
-                int arry[number1 * number2], k = 0;
-                for (int m = 0; m < number1; m++) {
-                    for (int n = 0; n < number2; n++, k++) {
-                        arry[k] = matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                int lens = size * size;
+                int arry[lens];
+                int k = 0;
+                for (int x = 0; x < size; x++) {
+                    for (int y = 0; y < size; y++, k++) {
+                        arry[k] = matrix[i - (size - 1) / 2 + x][j - (size - 1) / 2 + y];
                     }
                 }
-                qsort(arry, number1 * number2, sizeof(int), cmp);
+                qsort(arry, lens, sizeof(int), cmp);
                 int zmin = arry[0];
-                int zmax = arry[number1 * number2 - 1];
-                int zmed = arry[number1 * number2 / 2];
+                int zmed = arry[(lens - 1) / 2];
+                int zmax = arry[lens - 1];
                 int z = matrix[i][j];
                 int a1 = zmed - zmin;
                 int a2 = zmed - zmax;
                 if (a1 > 0 && a2 < 0) {
                     int b1 = z - zmin, b2 = z - zmax;
                     if (b1 > 0 && b2 < 0) {
-                        *tempout = z;
+                        tempout[i * matrixWidth + j] = z;
                     } else {
-                        *tempout = zmed;
+                        tempout[i * matrixWidth + j] = zmed;
                     }
                     break;
                 } else {
-                    size = (number1++) * (number2++);
+                    size += 2;
                     if (size > smax) {
-                        *tempout = zmed;
+                        tempout[i * matrixWidth + j] = z;
                         break;
                     }
                 }
             }
         }
     }
+
+    for (int k = 0; k < pos; k++)
+        for (int l = pos; l < matrixWidth - pos; l++)
+            tempout[k * matrixWidth + l] = tempout[pos * matrixWidth + l];
+    for (int a = matrixHeight - pos; a < matrixHeight; a++)
+        for (int b = pos; b < matrixWidth - pos; b++)
+            tempout[a * matrixWidth + b] = tempout[(matrixHeight - pos - 1) * matrixWidth + b];
+    for (int c = 0; c < pos; c++)
+        for (int d = 0; d < matrixHeight; d++)
+            tempout[d * matrixWidth + c] = tempout[d * matrixWidth + pos];
+    for (int e = matrixWidth - pos; e < matrixWidth; e++)
+        for (int f = 0; f < matrixHeight; f++)
+            tempout[f * matrixWidth + e] = tempout[f * matrixWidth + matrixWidth - pos - 1];
 
     return (outimage);
 }
@@ -132,61 +210,285 @@ Image *GeoFilterImage(Image *image, int number1, int number2) {
     return (outimage);
 }
 
-Image *BandrejectImage(Image *image, float w, float c) {
+Image *AddSinNoiseImage(Image *image, float sigma) {
     unsigned char *tempin, *tempout;
-    Image *inimage, *outimage;
-    inimage = Bandreject(image, w, c);
+    Image *outimage;
+    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Add Sin Noise");
+    tempin = image->data;
+    tempout = outimage->data;
 
-    outimage = RemoveZeros(inimage);
+    for (int i = 0; i < image->Height; i++) {
+        for (int j = 0; j < image->Width; j++, tempin++, tempout++) {
+            *tempout = *tempin + sigma * sin(i + j);
+        }
+    }
+
+    return (outimage);
+}
+
+Image *BandrejectImage(Image *image, float w, float c) {
+    unsigned char *tempout;
+    Image *outimage;
+
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
+            // printf("%lf\n", 1 - exp(p));
+            src[i * width + j].x *= (double)(1 - exp(p));
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
 
     return (outimage);
 }
 
 Image *HomomorphicImage(Image *image, float radius, float gamma1, float gamma2, float c) {
-    unsigned char *tempin, *tempout;
-    Image *inimage, *outimage;
+    Image *outimage;
 
-    inimage = Homomorphic(image, radius, gamma1, gamma2, c);
-    outimage = RemoveZeros(inimage);
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        if (image->data[i] == 0) {
+            src[i].x = 0.0;
+        } else {
+            src[i].x = 1.0 * log(image->data[i]);
+        }
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            double p = -c * pow(des / radius, 2);
+            src[i * width + j].x *= (gamma1 - gamma2) * (1 - exp(p)) + gamma2;
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#Homomorphic img");
+
+    for (int i = 0; i < size; i++) {
+        outimage->data[i] = exp(src[i].x);
+        if (outimage->data[i] > 255) {
+            outimage->data[i] = 255;
+        }
+        if (outimage->data[i] < 0) {
+            outimage->data[i] = 0;
+        }
+    }
 
     return (outimage);
 }
 
 Image *BHPF_TImage(Image *image, float radius, float rank) {
-    unsigned char *tempin, *tempout;
-    Image *inimage, *outimage;
+    unsigned char *tempout;
+    Image *outimage;
 
-    inimage = BHPF_T(image, radius, rank);
-    outimage = RemoveZeros(inimage);
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            src[i * width + j].x *= 1 - 1 / (1 + pow(des / radius, 2 * rank));
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#BHPF_T img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x < 100) {
+            src[i].x = 0;
+        } else {
+            src[i].x = 255;
+        }
+        outimage->data[i] = src[i].x;
+    }
 
     return (outimage);
 }
 
 Image *GLPFImage(Image *image, float radius) {
-    unsigned char *tempin, *tempout;
-    Image *inimage, *outimage;
+    unsigned char *tempout;
+    Image *outimage;
 
-    inimage = GLPF(image, radius);
-    outimage = RemoveZeros(inimage);
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            double p = -1 / 2 * pow(des / radius, 2);
+            src[i * width + j].x *= exp(p);
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#GLPF img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
 
     return (outimage);
 }
 
 Image *BLPFImage(Image *image, float radius, float rank) {
-    unsigned char *tempin, *tempout;
-    Image *inimage, *outimage;
+    unsigned char *tempout;
+    Image *outimage;
 
-    inimage = BLPF(image, radius, rank);
-    outimage = RemoveZeros(inimage);
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            src[i * width + j].x *= 1 / (1 + pow(des / radius, 2 * rank));
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#BLPF img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
+
     return (outimage);
 }
 
 Image *ILPFImage(Image *image, float radius) {
-    unsigned char *tempin, *tempout;
-    Image *inimage, *outimage;
+    unsigned char *tempout;
+    Image *outimage;
 
-    inimage = ILPF(image, radius);
-    outimage = RemoveZeros(inimage);
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            if (des > radius) {
+                src[i * width + j].x = 0;
+            }
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#ILPF img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
+
+    return (outimage);
+}
+
+Image *FFTImage(Image *image, int flag) {
+    int size = image->Height * image->Width;
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, image->Height, image->Width);
+
+    Image *outimage;
+    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"FFT result");
+    outimage->data = Normal(getResult(src, size), size, 255);
+
     return (outimage);
 }
 

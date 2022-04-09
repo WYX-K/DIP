@@ -18,25 +18,49 @@ int main() {
     // image = ReadPNMImage(input);
 
     // output = (char *)"..\\output\\bridge_Homomorphic.pgm";
-    // outimage = HomomorphicImage(image, 20, 1, 0.5, 5);
+    // outimage = ZeroPadding(image);
+    // outimage = HomomorphicImage(outimage, 20, 1, 0.5, 5);
+    // outimage = RemoveZeros(outimage);
     // SavePNMImage(outimage, output);
 
     // input = (char *)"..\\images\\goldhill.pgm";
     // image = ReadPNMImage(input);
 
     // output = (char *)"..\\output\\goldhill_Homomorphic.pgm";
-    // outimage = HomomorphicImage(image, 20, 1, 0.5, 5);
+    // outimage = HomomorphicImage(image, 20, 4, 0.5, 5);
+    // SavePNMImage(outimage, output);
+
+    input = (char *)"..\\images\\Lena.pgm";
+    image = ReadPNMImage(input);
+
+    output = (char *)"..\\output\\Lena_Bandreject.pgm";
+    outimage = ZeroPadding(image);
+    outimage = AddSinNoiseImage(outimage, 5);
+    outimage = BandrejectImage(outimage, 300, 50);
+    outimage = RemoveZeros(outimage);
+    SavePNMImage(outimage, output);
+
+    // input = (char *)"..\\images\\cameraWithNoise.pgm";
+    // image = ReadPNMImage(input);
+
+    // output = (char *)"..\\output\\cameraWithNoise_AdMedFilter.pgm";
+    // outimage = AdMedFilterImage(image, 3, 9);
     // SavePNMImage(outimage, output);
 
     // input = (char *)"..\\images\\LenaWithNoise.pgm";
     // image = ReadPNMImage(input);
 
     // output = (char *)"..\\output\\LenaWithNoise_Bandreject.pgm";
-    // outimage = BandrejectImage(image, 10, 100);
+    // image = ZeroPadding(image);
+    // // image = FFTImage(image, 1);
+    // image = BandrejectImage(image, 300, 50);
+    // outimage = RemoveZeros(image);
     // SavePNMImage(outimage, output);
 
-    input = (char *)"..\\images\\lenaD1.pgm";
-    image = ReadPNMImage(input);
+    // //    **********************************************************************
+
+    // input = (char *)"..\\images\\lenaD1.pgm";
+    // image = ReadPNMImage(input);
 
     // output = (char *)"..\\output\\lenaD1_AverFilter.pgm";
     // outimage = AverFilterImage(image, 3, 3);
@@ -51,12 +75,12 @@ int main() {
     // SavePNMImage(outimage, output);
 
     // output = (char *)"..\\output\\lenaD1_AlphaTrimmedMean.pgm";
-    // outimage = AlphaTrimmedMeanImage(image, 3, 3, 3);
+    // outimage = AlphaTrimmedMeanImage(image, 3, 3, 30);
     // SavePNMImage(outimage, output);
 
-    output = (char *)"..\\output\\lenaD1_AdMedFilter.pgm";
-    outimage = AdMedFilterImage(image, 3, 3, 49);
-    SavePNMImage(outimage, output);
+    // output = (char *)"..\\output\\lenaD1_AdMedFilter.pgm";
+    // outimage = AdMedFilterImage(image, 3, 9);
+    // SavePNMImage(outimage, output);
 
     return 0;
 }
