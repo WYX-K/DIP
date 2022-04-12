@@ -74,7 +74,7 @@ int main() {
     SavePNMImage(outimage, output);
 
     output = (char *)"..\\output\\lenaD1_AlphaTrimmedMean.pgm";
-    outimage = AlphaTrimmedMeanImage(image, 3, 3, 30);
+    outimage = AlphaTrimmedMeanImage(image, 3, 3, 2);
     SavePNMImage(outimage, output);
 
     output = (char *)"..\\output\\lenaD1_AdMedFilter.pgm";
@@ -84,6 +84,7 @@ int main() {
     // **********************************************************************
     input = (char *)"..\\images\\lenaD2.pgm";
     image = ReadPNMImage(input);
+
     output = (char *)"..\\output\\lenaD2_AverFilter.pgm";
     outimage = AverFilterImage(image, 3, 3);
     SavePNMImage(outimage, output);
@@ -97,7 +98,7 @@ int main() {
     SavePNMImage(outimage, output);
 
     output = (char *)"..\\output\\lenaD2_AlphaTrimmedMean.pgm";
-    outimage = AlphaTrimmedMeanImage(image, 3, 3, 30);
+    outimage = AlphaTrimmedMeanImage(image, 3, 3, 2);
     SavePNMImage(outimage, output);
 
     output = (char *)"..\\output\\lenaD2_AdMedFilter.pgm";
@@ -120,7 +121,7 @@ int main() {
     SavePNMImage(outimage, output);
 
     output = (char *)"..\\output\\lenaD3_AlphaTrimmedMean.pgm";
-    outimage = AlphaTrimmedMeanImage(image, 3, 3, 30);
+    outimage = AlphaTrimmedMeanImage(image, 3, 3, 2);
     SavePNMImage(outimage, output);
 
     output = (char *)"..\\output\\lenaD3_AdMedFilter.pgm";

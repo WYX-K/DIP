@@ -23,7 +23,7 @@ Image *RectNotchBandrejectImage(Image *image, int Rectheight, int Rectwidth) {
     }
 
     fft(src, src, -1, height, width);
-    outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
+    outimage = CreateNewImage(image, height, width, (char *)"#RectNotchBandreject img");
     // outimage->data = Normal(getResult(src, size), size, 255);
 
     for (int i = 0; i < size; i++) {
@@ -47,7 +47,7 @@ Image *ZeroPadding(Image *image, int height, int width) {
     int newWidth = matrixWidth + width;
     int newHeight = matrixHeight + height;
 
-    outimage = CreateNewImage(image, newHeight, newWidth, (char *)"#temp img");
+    outimage = CreateNewImage(image, newHeight, newWidth, (char *)"#ZeroPadding img");
 
     tempin = image->data;
     tempout = outimage->data;
@@ -78,7 +78,7 @@ Image *ZeroPadding(Image *image, int height, int width) {
 
 Image *RemoveZeros(Image *image, int height, int width) {
     int matrixWidth = image->Width, matrixHeight = image->Height;
-    Image *outimage = CreateNewImage(image, image->Height - height, image->Width - width, (char *)"#BLPF Image");
+    Image *outimage = CreateNewImage(image, image->Height - height, image->Width - width, (char *)"#RemoveZeros Image");
     unsigned char *tempout;
     tempout = outimage->data;
     unsigned char *tempin;
@@ -200,13 +200,19 @@ Image *AlphaTrimmedMeanImage(Image *image, int number1, int number2, int d) {
 
     for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
         for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++) {
-            int res = 0;
+            int arry[number1 * number2], k = 0;
             for (int m = 0; m < number1; m++) {
-                for (int n = 0; n < number2; n++) {
-                    res += matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
+                for (int n = 0; n < number2; n++, k++) {
+                    arry[k] = matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
                 }
             }
-            *tempout = res / (number1 * number2 - d);
+            qsort(arry, number1 * number2, sizeof(int), cmp);
+            int res = 0;
+            for (int k = d / 2; k < number1 * number2 - d / 2; k++) {
+                res += arry[k];
+            }
+            res /= number1 * number2 - d;
+            *tempout = res;
             tempout++;
         }
     }
@@ -236,15 +242,18 @@ Image *GeoFilterImage(Image *image, int number1, int number2) {
 
     for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
         for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempout++) {
-            int temp = 0;
             double res = 1;
             for (int m = 0; m < number1; m++) {
                 for (int n = 0; n < number2; n++) {
-                    temp = (unsigned char)matrix[i - zero1 / 2 + m][j - zero2 / 2 + n];
-                    res *= pow(temp, 1.0 / (number1 * number2));
+                    res *= pow(matrix[i - zero1 / 2 + m][j - zero2 / 2 + n], 1.0 / (number1 * number2));
                 }
             }
+            if (res > 255)
+                res = 255;
+            if (res < 0)
+                res = 0;
             *tempout = res;
+            // printf("%d\n", *tempout);
         }
     }
 
@@ -311,7 +320,7 @@ Image *IDealNotchBandrejectImage(Image *image, float d0, int x, int y) {
     }
 
     fft(src, src, -1, height, width);
-    outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
+    outimage = CreateNewImage(image, height, width, (char *)"#IDealNotchBandreject img");
     // outimage->data = Normal(getResult(src, size), size, 255);
 
     for (int i = 0; i < size; i++) {

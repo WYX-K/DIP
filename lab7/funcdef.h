@@ -64,10 +64,9 @@ Image *AdMedFilterImage(Image *image, int n, int smax);
  * @param {Image} *image - Image Pointer
  * @param {int} number1 - Filter kernel
  * @param {int} number2 - Filter kernel
- * @param {int} d
+ * @param {int} d - The number of pixels want to remove
  * @return {Image} Image Pointer
  */
-
 Image *AlphaTrimmedMeanImage(Image *image, int number1, int number2, int d);
 
 /**
