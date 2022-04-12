@@ -1,10 +1,51 @@
-Image *ZeroPadding(Image *image) {
+Image *RectNotchBandrejectImage(Image *image, int Rectheight, int Rectwidth) {
+    Image *outimage;
+
+    int size = image->Height * image->Width;
+    int width = image->Width;
+    int height = image->Height;
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * image->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            if (i < Rectheight && j < (width + Rectwidth) / 2 && j > (width - Rectwidth) / 2 || i > height - Rectheight && j < (width + Rectwidth) / 2 && j > (width - Rectwidth) / 2) {
+                src[i * width + j].x = 0;
+                src[i * width + j].y = 0;
+            }
+        }
+    }
+
+    fft(src, src, -1, height, width);
+    outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
+    // outimage->data = Normal(getResult(src, size), size, 255);
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
+
+    return (outimage);
+}
+
+Image *ZeroPadding(Image *image, int height, int width) {
     unsigned char *tempin, *tempout;
     Image *outimage;
     int matrixWidth = image->Width;
     int matrixHeight = image->Height;
-    int newWidth = image->Width * 2;
-    int newHeight = image->Height * 2;
+    int newWidth = matrixWidth + width;
+    int newHeight = matrixHeight + height;
 
     outimage = CreateNewImage(image, newHeight, newWidth, (char *)"#temp img");
 
@@ -35,9 +76,9 @@ Image *ZeroPadding(Image *image) {
     return (outimage);
 }
 
-Image *RemoveZeros(Image *image) {
+Image *RemoveZeros(Image *image, int height, int width) {
     int matrixWidth = image->Width, matrixHeight = image->Height;
-    Image *outimage = CreateNewImage(image, image->Height / 2, image->Width / 2, (char *)"#BLPF Image");
+    Image *outimage = CreateNewImage(image, image->Height - height, image->Width - width, (char *)"#BLPF Image");
     unsigned char *tempout;
     tempout = outimage->data;
     unsigned char *tempin;
@@ -52,8 +93,8 @@ Image *RemoveZeros(Image *image) {
         }
     }
 
-    for (int i = 0; i < matrixHeight / 2; i++) {
-        for (int j = 0; j < image->Width / 2; j++, tempout++) {
+    for (int i = 0; i < matrixHeight - height; i++) {
+        for (int j = 0; j < matrixWidth - width; j++, tempout++) {
             *tempout = matrix[i][j];
         }
     }
@@ -211,27 +252,43 @@ Image *GeoFilterImage(Image *image, int number1, int number2) {
 }
 
 Image *AddSinNoiseImage(Image *image, float sigma) {
-    unsigned char *tempin, *tempout;
     Image *outimage;
     outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Add Sin Noise");
-    tempin = image->data;
-    tempout = outimage->data;
 
-    for (int i = 0; i < image->Height; i++) {
-        for (int j = 0; j < image->Width; j++, tempin++, tempout++) {
-            *tempout = *tempin + sigma * sin(i + j);
+    int size = image->Height * image->Width;
+    int width = image->Width, height = image->Height;
+
+    int *src = (int *)malloc(sizeof(int) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i] = 1.0 * image->data[i];
+    }
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            src[i * width + j] += sigma * sin(i + j);
         }
+    }
+
+    for (int i = 0; i < size; i++) {
+        if (src[i] > 255) {
+            src[i] = 255;
+        }
+        if (src[i] < 0) {
+            src[i] = 0;
+        }
+        outimage->data[i] = src[i];
     }
 
     return (outimage);
 }
 
-Image *BandrejectImage(Image *image, float w, float c) {
-    unsigned char *tempout;
+Image *IDealNotchBandrejectImage(Image *image, float d0, int x, int y) {
     Image *outimage;
 
     int size = image->Height * image->Width;
-    int width = image->Width, height = image->Height;
+    int width = image->Width;
+    int height = image->Height;
     struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
 
     for (int i = 0; i < size; ++i) {
@@ -243,18 +300,27 @@ Image *BandrejectImage(Image *image, float w, float c) {
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
-            double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
-            // printf("%lf\n", 1 - exp(p));
-            src[i * width + j].x *= (double)(1 - exp(p));
+            double des1 = sqrt(pow(i - x, 2) + pow(j - y, 2));
+            double des2 = sqrt(pow(i - (height - x), 2) + pow(j - (width - y), 2));
+            // double p = -0.5 * pow((double)(pow(des, 2) - pow(c, 2)) / (des * w), 2);
+            // src[i * width + j].x *= (double)(1 - exp(p));
+            if (des1 < d0 || des2 < d0) {
+                src[i * width + j].x = 0;
+            }
         }
     }
 
     fft(src, src, -1, height, width);
-
     outimage = CreateNewImage(image, height, width, (char *)"#Bandreject img");
+    // outimage->data = Normal(getResult(src, size), size, 255);
 
     for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
         outimage->data[i] = src[i].x;
     }
 
@@ -294,12 +360,6 @@ Image *HomomorphicImage(Image *image, float radius, float gamma1, float gamma2, 
 
     for (int i = 0; i < size; i++) {
         outimage->data[i] = exp(src[i].x);
-        if (outimage->data[i] > 255) {
-            outimage->data[i] = 255;
-        }
-        if (outimage->data[i] < 0) {
-            outimage->data[i] = 0;
-        }
     }
 
     return (outimage);

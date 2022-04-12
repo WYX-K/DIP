@@ -10,13 +10,13 @@ unsigned char *Normal(double *arr_in, int size, int range) {
     }
 
     for (i = 0; i < size; ++i)
-        arr_out[i] = (int)log(((arr_in[i] - min) / (max - min) * range) + 1) * 20;
+        arr_out[i] = (int)(log((double)(arr_in[i] - min) / (max - min) * range + 1) * 20);
     return arr_out;
 }
 
 void fft(struct _complex *src, struct _complex *dst, int flag, int height, int width) {
     int y, x, i, u, k, n;
-    int NUM_y = 256, NUM_x = 256;
+    NUM_y = height, NUM_x = width;
     double wu;
     struct _complex w, a0, a1, t;
     clock_t start, end;
@@ -107,7 +107,7 @@ double *getResult(struct _complex *src, int size) {
 void fft_shift(struct _complex *src, int height, int width) {
     int x, y, a, b;
     struct _complex tmp;
-    int NUM_y = height, NUM_x = width;
+    NUM_y = height, NUM_x = width;
 
     for (y = 0; y < NUM_y / 2; y++) {
         for (x = 0; x < NUM_x; x++) {
@@ -123,7 +123,7 @@ void fft_shift(struct _complex *src, int height, int width) {
 
 void split_array(struct _complex *src, struct _complex *dst, int x_n, int y_n, int flag, int height, int width) {
     int i;
-    int NUM_y = height, NUM_x = width;
+    NUM_y = height, NUM_x = width;
     //	struct _complex t[flag == 0 ? x_n/2 : y_n/2];
     struct _complex *s = src, *d = dst;
     struct _complex *t = (struct _complex *)malloc(sizeof(struct _complex) * (flag == 0 ? x_n / 2 : y_n / 2));

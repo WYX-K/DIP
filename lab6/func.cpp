@@ -1,445 +1,444 @@
-Image *BHPF_TImage(Image *image, float radius, float rank) {
+Image *BHPF_T(Image *image, float radius, float rank) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;
 
-    inimage = BHPF_T(image, radius, rank);
-    outimage = RemoveZeros(inimage);
+    inimage = ZeroPadding(image);
+    tempin = inimage->data;
+    int size = inimage->Height * inimage->Width;
+    int width = inimage->Width, height = inimage->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * inimage->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            src[i * width + j].x *= 1 - 1 / (1 + pow(des / radius, 2 * rank));
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#BHPF_T img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x < 100) {
+            src[i].x = 0;
+        } else {
+            src[i].x = 255;
+        }
+        outimage->data[i] = src[i].x;
+    }
 
     return (outimage);
 }
 
-Image *GLPFImage(Image *image, float radius) {
+Image *GLPF(Image *image, float radius) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;
 
-    inimage = GLPF(image, radius);
-    outimage = RemoveZeros(inimage);
+    inimage = ZeroPadding(image);
+    tempin = inimage->data;
+    int size = inimage->Height * inimage->Width;
+    int width = inimage->Width, height = inimage->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * inimage->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            double p = -(double)(1 / 2) * pow(des / radius, 2);
+            src[i * width + j].x *= exp(p);
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#GLPF img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
 
     return (outimage);
 }
 
-Image *BLPFImage(Image *image, float radius, float rank) {
+Image *BLPF(Image *image, float radius, float rank) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;
 
-    inimage = BLPF(image, radius, rank);
-    outimage = RemoveZeros(inimage);
+    inimage = ZeroPadding(image);
+    tempin = inimage->data;
+    int size = inimage->Height * inimage->Width;
+    int width = inimage->Width, height = inimage->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * inimage->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            src[i * width + j].x *= 1 / (1 + pow(des / radius, 2 * rank));
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#BLPF img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
+
     return (outimage);
 }
 
-Image *ILPFImage(Image *image, float radius) {
+Image *ILPF(Image *image, float radius) {
     unsigned char *tempin, *tempout;
     Image *inimage, *outimage;
 
-    inimage = ILPF(image, radius);
-    outimage = RemoveZeros(inimage);
+    inimage = ZeroPadding(image);
+    tempin = inimage->data;
+    int size = inimage->Height * inimage->Width;
+    int width = inimage->Width, height = inimage->Height;
+
+    struct _complex *src = (struct _complex *)malloc(sizeof(struct _complex) * size);
+
+    for (int i = 0; i < size; ++i) {
+        src[i].x = 1.0 * inimage->data[i];
+        src[i].y = 0.0;
+    }
+
+    fft(src, src, 1, height, width);
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            double des = sqrt(pow(i - (double)height / 2, 2) + pow(j - (double)width / 2, 2));
+            if (des > radius) {
+                src[i * width + j].x = 0;
+            }
+        }
+    }
+
+    fft(src, src, -1, height, width);
+
+    outimage = CreateNewImage(image, height, width, (char *)"#ILPF img");
+
+    for (int i = 0; i < size; i++) {
+        if (src[i].x > 255) {
+            src[i].x = 255;
+        }
+        if (src[i].x < 0) {
+            src[i].x = 0;
+        }
+        outimage->data[i] = src[i].x;
+    }
+
     return (outimage);
 }
 
-Image *MagnitudeImage(Image *image) {
+Image *ZeroPadding(Image *image) {
     unsigned char *tempin, *tempout;
     Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Magnitude Reconstruction");
-    tempin = image->data;
-    tempout = outimage->data;
     int matrixWidth = image->Width;
     int matrixHeight = image->Height;
-    int size = matrixHeight * matrixWidth;
-    int matrix[matrixWidth][matrixHeight];
-    int c = matrixHeight;
+    int newWidth = image->Width * 2;
+    int newHeight = image->Height * 2;
+
+    outimage = CreateNewImage(image, newHeight, newWidth, (char *)"#temp img");
+    tempin = image->data;
+    tempout = outimage->data;
+
+    int matrix[matrixHeight][matrixWidth];
     memset(matrix, 0, sizeof(matrix));
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempin++) {
-            matrix[i][j] = *tempin;
-        }
-    }
-
-    printf("Begin!...\n");
-
-    double re, im, temp;
-    double Magnitude[matrixWidth][matrixHeight];
-
     for (int i = 0; i < matrixHeight; i++) {
-        for (int j = 0; j < matrixWidth; j++) {
-            re = 0;
-            im = 0;
-            for (int x = 0; x < matrixHeight; x++) {
-                for (int y = 0; y < matrixWidth; y++) {
-                    temp = (double)i * x / (double)matrixHeight + (double)j * y / (double)matrixWidth;
-                    re += matrix[x][y] * cos(-2 * PI * temp);
-                    im += matrix[x][y] * sin(-2 * PI * temp);
-                }
-            }
-            Magnitude[i][j] = sqrt(pow(re, 2) + pow(im, 2));
+        for (int j = 0; j < matrixWidth; j++, tempin++) {
+            matrix[i][j] = *tempin;
         }
     }
 
+    for (int i = 0; i < newHeight; i++) {
+        for (int j = 0; j < newWidth; j++, tempout++) {
+            if (i < matrixHeight && j < matrixWidth) {
+                *tempout = matrix[i][j];
+            } else {
+                *tempout = 0;
+            }
+        }
+    }
+
+    return (outimage);
+}
+
+Image *RemoveZeros(Image *image) {
+    int matrixWidth = image->Width, matrixHeight = image->Height;
+
+    Image *outimage = CreateNewImage(image, image->Height / 2, image->Width / 2, (char *)"#BLPF Image");
+    unsigned char *tempout;
+    tempout = outimage->data;
+    unsigned char *tempin;
+    tempin = image->data;
+
+    int matrix[matrixHeight][matrixWidth];
+
+    memset(matrix, 0, sizeof(matrix));
     for (int i = 0; i < matrixHeight; i++) {
-        for (int j = 0; j < matrixWidth; j++, tempout++) {
-            re = 0;
-            for (int x = 0; x < matrixHeight; x++) {
-                for (int y = 0; y < matrixWidth; y++) {
-                    temp = (double)i * x / (double)matrixHeight + (double)j * y / (double)matrixWidth;
-                    re += Magnitude[x][y] * cos(2 * PI * temp);
-                }
-            }
-            int res = re / size;
-            if (res < 0) {
-                res = 0;
-            } else if (res > 255) {
-                res = 255;
-            }
-            *tempout = res;
-        }
-    }
-
-    printf("Success!\n");
-
-    return (outimage);
-}
-
-Image *PhaseAngleImage(Image *image) {
-    unsigned char *tempin, *tempout;
-    Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Phase Angle Reconstruction");
-    tempin = image->data;
-    tempout = outimage->data;
-    int matrixWidth = image->Width;
-    int matrixHeight = image->Height;
-    int size = matrixHeight * matrixWidth;
-
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempin++) {
+        for (int j = 0; j < matrixWidth; j++, tempin++) {
             matrix[i][j] = *tempin;
         }
     }
 
-    double PhaseAngle[matrixWidth][matrixHeight];
-
-    printf("Begin!...\n");
-
-    for (int i = 0; i < matrixHeight; i++) {
-        for (int j = 0; j < matrixWidth; j++) {
-            double re = 0;
-            double im = 0;
-            for (int x = 0; x < matrixHeight; x++) {
-                for (int y = 0; y < matrixWidth; y++) {
-                    double temp = (double)i * x / (double)matrixHeight + (double)j * y / (double)matrixWidth;
-                    re += matrix[x][y] * cos(-2 * PI * temp);
-                    im += matrix[x][y] * sin(-2 * PI * temp);
-                }
-            }
-            PhaseAngle[i][j] = atan2(im, re);
+    for (int i = 0; i < matrixHeight / 2; i++) {
+        for (int j = 0; j < image->Width / 2; j++, tempout++) {
+            *tempout = matrix[i][j];
         }
     }
 
-    for (int i = 0; i < matrixHeight; i++) {
-        for (int j = 0; j < matrixWidth; j++, tempout++) {
-            double re = 0;
-            for (int x = 0; x < matrixHeight; x++) {
-                for (int y = 0; y < matrixWidth; y++) {
-                    double temp = (double)i * x / (double)matrixHeight + (double)j * y / (double)matrixWidth;
-                    re += cos(PhaseAngle[x][y] + 2 * PI * temp);
-                }
-            }
-            int res = re;
-            if (res < 0) {
-                res = 0;
-            } else if (res > 255) {
-                res = 255;
-            }
-            *tempout = res;
-        }
-    }
-
-    printf("Success!\n");
-
-    return (outimage);
+    return outimage;
 }
 
-Image *DFTImage(Image *image) {
-    unsigned char *tempin, *tempout;
-    Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#DFT Transform");
-    tempin = image->data;
-    tempout = outimage->data;
-    int matrixWidth = image->Width;
-    int matrixHeight = image->Height;
-    int size = matrixHeight * matrixWidth;
-    int matrix[matrixWidth][matrixHeight];
-    int c = matrixHeight;
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempin++) {
-            matrix[i][j] = *tempin * pow(-1, i + j);
-        }
-    }
+void fft(struct _complex *src, struct _complex *dst, int flag, int height, int width) {
+    int y, x, i, u, k, n;
+    int NUM_y = height, NUM_x = width;
+    double wu;
+    struct _complex w, a0, a1, t;
+    clock_t start, end;
+    start = clock();
+    // 閸屽懘鍣烽崣鑸殿劀閸欐ɑ宕查弮璁圭礉鐏忓棔鑵戣箛鍐ㄩ挬缁夎鍩岄崶娑滅珶
+    if (flag == -1)
+        fft_shift(src, NUM_y, NUM_x);
+    // 鐎电畧濮ｅ繋绔寸悰灞戒粵閸屽懘鍣烽崣璺哄綁閹癸拷
+    for (y = 0; y < NUM_y; y++) {
+        // 閸忓牆鍨庨崜鍙夋殶缂侊拷
+        split_array(&src[y * NUM_x + 0], &dst[y * NUM_x + 0], NUM_x, 0, 0, NUM_y, NUM_x); // 鐎碉拷 x閸掑棛绮�
 
-    printf("Begin!...\n");
+        // 鐎碉拷 f[y][] 鏉╂瑤绔寸紒鍕殶鏉╂稖顢戦崒鍛村櫡閸欒泛褰夐幑锟�
+        for (i = 0; i < log(1.0 * NUM_x) / log(2.0); i++) { //鐠侊紕鐣诲▎鈩冩殶娑擄拷 2^n = num閿涘苯宓唍 = log2^num
+            // 濮ｅ繑顐肩拋锛勭暬閻ㄥ嫰妫块梾鏃€妲� 2^n,閸掑棗鍩嗘稉锟� 1閿涳拷2閿涳拷4閿涳拷8
+            n = 2 * pow(2.0, i);                // 閺堫剝鐤嗘稉鈧紒鍕嚋閺侀璐� 2 * 2^n閿涘苯鍨庨崚顐¤礋 2,4,8,閸掓瑥銈�3鏉烇拷
+            for (k = 0; k < NUM_x / n; k++) {   // num/n 娑撳搫缍嬮崜宥囨畱缂佸嫭鏆熼敍灞藉瀻閸掝偂璐� 4閿涳拷2閿涳拷1
+                for (u = 0; u < n / 2; u++) {   // 鐎佃鐦＄紒鍕箻鐞涘矁顓哥粻锟�, a0 閸滐拷 b0 閻ㄥ嫪閲滈弫鏉垮瀻閸掝偂璐� n/2
+                    wu = -1 * 2 * M_PI * u / n; // 鐠侊紕鐣婚弮瀣祮閸ョ姴鐡�
+                    w.x = cos(wu);
+                    w.y = flag * sin(wu); //  婵″倹鐏夐弰顖氬€曢柌灞藉骄闁棗褰夐幑顫礉濮濄倕顦� flag = -1
 
-    double re, im, temp;
+                    a0 = dst[y * NUM_x + k * n + u];         // 婵傚洦鏆熸い锟� 	[y][k*n+u]
+                    a1 = dst[y * NUM_x + k * n + u + n / 2]; // 閸嬭埖鏆熸い锟� 	[y][k*n+u+n/2]
 
-    for (int i = 0; i < matrixHeight; i++) {
-        for (int j = 0; j < matrixWidth; j++, tempout++) {
-            re = 0;
-            im = 0;
-            for (int x = 0; x < matrixHeight; x++) {
-                for (int y = 0; y < matrixWidth; y++) {
-                    temp = (double)i * x / (double)matrixHeight + (double)j * y / (double)matrixWidth;
-                    re += matrix[x][y] * cos(-2 * PI * temp);
-                    im += matrix[x][y] * sin(-2 * PI * temp);
+                    t.x = w.x * a1.x - w.y * a1.y;
+                    t.y = w.x * a1.y + w.y * a1.x;
+
+                    dst[y * NUM_x + k * n + u].x = a0.x + t.x; // F[u] = A0 + wA1
+                    dst[y * NUM_x + k * n + u].y = a0.y + t.y;
+                    dst[y * NUM_x + k * n + u + n / 2].x = a0.x - t.x; // F[u+n/2] = A0 - wA1
+                    dst[y * NUM_x + k * n + u + n / 2].y = a0.y - t.y;
                 }
             }
-            re = c * re / size;
-            im = c * im / size;
-            int res = 50 * log(1 + sqrt(pow(re, 2) + pow(im, 2)));
-            if (res < 0) {
-                res = 0;
-            } else if (res > 255) {
-                res = 255;
+        }
+        if (flag == 1) // 濮濓絽鎮滈弮璁圭礉闂勩倓绔存稉鐚夐梹鍨閿涘矂浼╅崗宥嗘殶閹诡喛绻冩径褝绱濋張顒佹降娑撳秴绨茬拠銉╂珟閻拷
+            for (u = 0; u < NUM_x; u++) {
+                dst[y * NUM_x + u].x /= NUM_x;
+                dst[y * NUM_x + u].y /= NUM_x;
             }
-            *tempout = res;
-        }
     }
 
-    printf("Success!\n");
+    // 鐎电畨濮ｅ繋绔撮崚妤€浠涢崒鍛村櫡閸欒泛褰夐幑锟�
+    for (x = 0; x < NUM_x; x++) {
+        // 閸忓牆鍨庨崜鍙夋殶缂侊拷
+        split_array(&dst[0 * NUM_x + x], &dst[0 * NUM_x + x], 0, NUM_y, 1, NUM_y, NUM_x); // 鐎碉拷 y閸掑棛绮�
 
-    return (outimage);
-}
+        // 鐎碉拷 f[][x] 鏉╂瑤绔寸紒鍕殶鏉╂稖顢戦崒鍛村櫡閸欒泛褰夐幑锟�
+        for (i = 0; i < log(1.0 * NUM_y) / log(2.0); i++) { //鐠侊紕鐣诲▎鈩冩殶娑擄拷 2^n = num閿涘苯宓唍 = log2^num
+            // 濮ｅ繑顐肩拋锛勭暬閻ㄥ嫰妫块梾鏃€妲� 2^n,閸掑棗鍩嗘稉锟� 1閿涳拷2閿涳拷4閿涳拷8
+            n = 2 * pow(2.0, i);                // 閺堫剝鐤嗘稉鈧紒鍕嚋閺侀璐� 2 * 2^n閿涘苯鍨庨崚顐¤礋 2,4,8,閸掓瑥銈�3鏉烇拷
+            for (k = 0; k < NUM_y / n; k++) {   // num/n 娑撳搫缍嬮崜宥囨畱缂佸嫭鏆熼敍灞藉瀻閸掝偂璐� 4閿涳拷2閿涳拷1
+                for (u = 0; u < n / 2; u++) {   // 鐎佃鐦＄紒鍕箻鐞涘矁顓哥粻锟�, a0 閸滐拷 b0 閻ㄥ嫪閲滈弫鏉垮瀻閸掝偂璐� n/2
+                    wu = -1 * 2 * M_PI * u / n; // 鐠侊紕鐣婚弮瀣祮閸ョ姴鐡�
+                    w.x = cos(wu);
+                    w.y = flag * sin(wu); //  婵″倹鐏夐弰顖氬€曢柌灞藉骄闁棗褰夐幑顫礉濮濄倕顦� flag = -1
 
-Image *HistogramEnhancementLocalImage(Image *image, int number1, int number2) {
-    unsigned char *tempin, *tempout;
-    int zero1 = number1 - 1;
-    int zero2 = number2 - 1;
-    Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Histogram Enhancement Local");
-    tempin = image->data;
-    tempout = outimage->data;
+                    a0 = dst[(k * n + u) * NUM_x + x];         // 婵傚洦鏆熸い锟� 	[k*n+u][x]
+                    a1 = dst[(k * n + u + n / 2) * NUM_x + x]; // 閸嬭埖鏆熸い锟� 		[(k*n + u + n/2)*NUM_y 	+ x ][x]
 
-    int matrixWidth = image->Width + zero1;
-    int matrixHeight = image->Height + zero2;
+                    t.x = w.x * a1.x - w.y * a1.y;
+                    t.y = w.x * a1.y + w.y * a1.x;
 
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
-        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempin++) {
-            matrix[i][j] = *tempin;
-        }
-    }
-
-    for (int i = zero1 / 2; i < matrixWidth - zero1 / 2; i++) {
-        for (int j = zero2 / 2; j < matrixHeight - zero2 / 2; j++, tempout++) {
-            float array[256];
-            memset(array, 0, sizeof(array));
-            for (int m = 0; m < number1; m++) {
-                for (int n = 0; n < number2; n++) {
-                    array[matrix[i - zero1 / 2 + m][j - zero2 / 2 + n]]++;
+                    dst[(k * n + u) * NUM_x + x].x = a0.x + t.x; // F[u] = A0 + wA1
+                    dst[(k * n + u) * NUM_x + x].y = a0.y + t.y;
+                    dst[(k * n + u + n / 2) * NUM_x + x].x = a0.x - t.x; // F[u+n/2] = A0 - wA1
+                    dst[(k * n + u + n / 2) * NUM_x + x].y = a0.y - t.y;
                 }
             }
-            for (int i = 0; i < 256; i++) {
-                array[i] /= number1 * number2;
-            }
-            int res[256];
-            memset(res, 0, sizeof(res));
-            for (int i = 0; i < 256; i++) {
-                float sum = 0.0;
-                for (int j = 0; j <= i; j++) {
-                    sum += array[j];
-                }
-                res[i] = round(sum * 255);
-            }
-            *tempout = res[matrix[i][j]];
         }
+        if (flag == -1)
+            for (u = 0; u < NUM_y; u++) {
+                dst[u * NUM_x + x].x /= NUM_y;
+                dst[u * NUM_x + x].y /= NUM_y;
+            }
     }
 
-    return (outimage);
+    // 閸屽懘鍣烽崣鑸殿劀閸欐ɑ宕查弮璁圭礉鐏忓棗娲撴潏鐟伴挬缁夎鍩屾稉顓炵妇
+    if (flag == 1)
+        fft_shift(dst, NUM_y, NUM_x);
+
+    // 閹垫挸宓冭ぐ鎾冲綁閹广垻绮ㄩ弸锟�
+    end = clock();
+    printf("\n閸屽懘鍣烽崣锟�%s閸欐ɑ宕茬紒鎾存将閿涘矁鈧妞�%fs, NUM=%d x %d\n", flag == 1 ? "" : "闁拷", (double)(end - start) / CLOCKS_PER_SEC, NUM_x, NUM_y);
 }
 
-Image *HistogramEnhancementGlobalImage(Image *image) {
-    unsigned char *tempin, *tempout;
-    Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Histogram Enhancement Global");
-    tempin = image->data;
-    tempout = outimage->data;
-    int matrixWidth = image->Width;
-    int matrixHeight = image->Height;
+double *getResult(struct _complex *src, int size) {
+    int i;
+    double *res = (double *)malloc(sizeof(double) * size);
 
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempin++) {
-            matrix[i][j] = *tempin;
-        }
-    }
+    for (i = 0; i < size; ++i)
+        res[i] = sqrt(src[i].x * src[i].x + src[i].y * src[i].y);
 
-    float array[256];
-    memset(array, 0, sizeof(array));
-
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++) {
-            array[matrix[i][j]]++;
-        }
-    }
-
-    for (int i = 0; i < 256; i++) {
-        array[i] /= matrixWidth * matrixHeight;
-    }
-
-    int res[256];
-    memset(res, 0, sizeof(res));
-
-    for (int i = 0; i < 256; i++) {
-        float sum = 0.0;
-        for (int j = 0; j <= i; j++) {
-            sum += array[j];
-        }
-        res[i] = round(sum * 255);
-    }
-
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempout++) {
-            *tempout = res[matrix[i][j]];
-        }
-    }
-
-    return (outimage);
+    return res;
 }
 
-Image *GammaCorrectionImage(Image *image, float gamma) {
-    unsigned char *tempin, *tempout;
-    Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Gamma Correction");
-    tempin = image->data;
-    tempout = outimage->data;
+void fft_shift(struct _complex *src, int height, int width) {
+    int x, y, a, b;
+    struct _complex tmp;
+    int NUM_y = height, NUM_x = width;
 
-    int matrixWidth = image->Width;
-    int matrixHeight = image->Height;
+    for (y = 0; y < NUM_y / 2; y++) {
+        for (x = 0; x < NUM_x; x++) {
+            a = y * NUM_x + x;
+            b = ((y + NUM_y / 2) % NUM_y) * NUM_x + (NUM_x / 2 + x) % NUM_x;
 
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempin++) {
-            matrix[i][j] = *tempin;
+            tmp = src[a];
+            src[a] = src[b];
+            src[b] = tmp;
         }
     }
-    for (int i = 0; i < matrixWidth; i++) {
-        for (int j = 0; j < matrixHeight; j++, tempout++) {
-            int res = (matrixWidth - 1) * pow((float)matrix[i][j] / matrixWidth, gamma);
-            *tempout = res;
-        }
-    }
-
-    // compute the variances of the resulted images
-
-    float sum = 0.0;
-    tempout = outimage->data;
-    for (int i = 0; i < matrixWidth * matrixHeight; i++, tempout++) {
-        sum += *tempout;
-    }
-    float mean = sum / (matrixWidth * matrixHeight);
-    sum = 0.0;
-    tempout = outimage->data;
-    for (int i = 0; i < matrixWidth * matrixHeight; i++, tempout++) {
-        sum += pow(*tempout - mean, 2);
-    }
-    float var = sum / (matrixWidth * matrixHeight);
-
-    printf("The variance of Gamma Correction(%0.2f) is %0.2f.\n", gamma, var);
-    return (outimage);
 }
 
-Image *SobelImage(Image *image) {
-    unsigned char *tempin, *tempout;
-    Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Sobel Sharpen Filter");
-    tempin = image->data;
-    tempout = outimage->data;
+void split_array(struct _complex *src, struct _complex *dst, int x_n, int y_n, int flag, int height, int width) {
+    int i;
+    int NUM_y = height, NUM_x = width;
+    //	struct _complex t[flag == 0 ? x_n/2 : y_n/2];
+    struct _complex *s = src, *d = dst;
+    struct _complex *t = (struct _complex *)malloc(sizeof(struct _complex) * (flag == 0 ? x_n / 2 : y_n / 2));
 
-    int matrixWidth = image->Width + 2;
-    int matrixHeight = image->Height + 2;
-    int filter_x[3][3] = {
-        {1, 0, -1},
-        {2, 0, -2},
-        {1, 0, -1}};
-    int filter_y[3][3] = {
-        {-1, -2, -1},
-        {0, 0, 0},
-        {1, 2, 1}};
+    if (flag == 0) {
+        if (x_n <= 1) return;
 
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = 1; i < matrixWidth - 1; i++) {
-        for (int j = 1; j < matrixHeight - 1; j++, tempin++) {
-            matrix[i][j] = *tempin;
+        for (i = 0; i < x_n / 2; i++) {
+            t[i].x = s[i * 2 + 1].x; // 闁哄棗鍊搁悺銊︾附閸ャ劍娈跺锟�?
+            t[i].y = s[i * 2 + 1].y;
+
+            d[i].x = s[i * 2].x; // 闁归鏌夌粈澶愬磻閼稿灚娈跺銈囨嚀閸╁本鎷呮惔婵堢Т
+            d[i].y = s[i * 2].y;
         }
-    }
-
-    for (int i = 1; i < matrixWidth - 1; i++) {
-        for (int j = 1; j < matrixHeight - 1; j++, tempout++) {
-            int res_x = 0;
-            int res_y = 0;
-            for (int m = 0; m < 3; m++) {
-                for (int n = 0; n < 3; n++) {
-                    res_x += matrix[i - 1 + m][j - 1 + n] * filter_x[m][n];
-                    res_y += matrix[i - 1 + m][j - 1 + n] * filter_y[m][n];
-                }
-            }
-            int res = sqrt(pow(res_x, 2) + pow(res_y, 2));
-            if (res < 0) {
-                res = 0;
-            } else if (res > 255) {
-                res = 255;
-            }
-            *tempout = res;
+        for (i = 0; i < x_n / 2; i++) {
+            d[i + x_n / 2].x = t[i].x; // 闁归鏌夌粈澶嬬附閸ャ劍娈跺銈囨嚀閸╁本顨囧Ο鍦Т
+            d[i + x_n / 2].y = t[i].y;
         }
-    }
+        split_array(dst, dst, x_n / 2, y_n, flag, NUM_y, NUM_x);
+        split_array(dst + x_n / 2, dst + x_n / 2, x_n / 2, y_n, flag, NUM_y, NUM_x);
+    } else {
+        if (y_n <= 1) return;
 
-    return (outimage);
+        for (i = 0; i < y_n / 2; i++) {
+            t[i].x = s[(i * 2 + 1) * NUM_x].x; // 闁哄棗鍊搁悺銊︾附閸ャ劍娈跺锟�?
+            t[i].y = s[(i * 2 + 1) * NUM_x].y;
+
+            d[i * NUM_x].x = s[(i * 2) * NUM_x].x; // 闁归鏌夌粈澶愬磻閼稿灚娈跺銈囨嚀閸╁本鎷呮惔婵堢Т
+            d[i * NUM_x].y = s[(i * 2) * NUM_x].y;
+        }
+        for (i = 0; i < y_n / 2; i++) {
+            d[(i + y_n / 2) * NUM_x].x = t[i].x; // 闁归鏌夌粈澶嬬附閸ャ劍娈跺銈囨嚀閸╁本顨囧Ο鍦Т
+            d[(i + y_n / 2) * NUM_x].y = t[i].y;
+        }
+        split_array(dst, dst, x_n, y_n / 2, flag, NUM_y, NUM_x);
+        split_array(dst + NUM_x * y_n / 2, dst + NUM_x * y_n / 2, x_n, y_n / 2, flag, NUM_y, NUM_x);
+    }
 }
 
-Image *LaplacianImage(Image *image) {
-    unsigned char *tempin, *tempout;
+int cmp(const void *a, const void *b) {
+    return *(int *)a - *(int *)b;
+}
+
+Image *CreateNewImage(Image *image, int height, int width, char *comment) {
     Image *outimage;
-    outimage = CreateNewImage(image, image->Height, image->Width, (char *)"#Laplacian Sharpen Filter");
-    tempin = image->data;
-    tempout = outimage->data;
+    int size, j;
 
-    int matrixWidth = image->Width + 2;
-    int matrixHeight = image->Height + 2;
-    int filter[3][3] = {
-        {0, -1, 0},
-        {-1, 4, -1},
-        {0, -1, 0}};
+    outimage = (Image *)malloc(sizeof(Image));
 
-    int matrix[matrixWidth][matrixHeight];
-    memset(matrix, 0, sizeof(matrix));
-    for (int i = 1; i < matrixWidth - 1; i++) {
-        for (int j = 1; j < matrixHeight - 1; j++, tempin++) {
-            matrix[i][j] = *tempin;
-        }
+    outimage->Type = image->Type;
+    if (outimage->Type == GRAY)
+        size = height * width;
+    else if (outimage->Type == COLOR)
+        size = height * width * 3;
+
+    outimage->Width = width;
+    outimage->Height = height;
+    outimage->num_comment_lines = image->num_comment_lines;
+
+    /*--------------------------------------------------------*/
+    /* Copy Comments for Original Image      */
+    for (j = 0; j < outimage->num_comment_lines; j++)
+        strcpy(outimage->comments[j], image->comments[j]);
+
+    /*----------- Add New Comment  ---------------------------*/
+    strcpy(outimage->comments[outimage->num_comment_lines], comment);
+    outimage->num_comment_lines++;
+
+    outimage->data = (unsigned char *)malloc(size);
+    if (!outimage->data) {
+        printf("cannot allocate memory for new image");
+        exit(0);
     }
-
-    for (int i = 1; i < matrixWidth - 1; i++) {
-        for (int j = 1; j < matrixHeight - 1; j++, tempout++) {
-            int res = 0;
-            for (int m = 0; m < 3; m++) {
-                for (int n = 0; n < 3; n++) {
-                    res += matrix[i - 1 + m][j - 1 + n] * filter[m][n];
-                }
-            }
-            res = matrix[i][j] + (float)res * 0.5;
-            if (res < 0) {
-                res = 0;
-            } else if (res > 255) {
-                res = 255;
-            }
-            *tempout = res;
-        }
-    }
-
     return (outimage);
+}
+int res = 0;
+for (int m = 0; m < 3; m++) {
+    for (int n = 0; n < 3; n++) {
+        res += matrix[i - 1 + m][j - 1 + n] * filter[m][n];
+    }
+}
+res = matrix[i][j] + (float)res * 0.5;
+if (res < 0) {
+    res = 0;
+} else if (res > 255) {
+    res = 255;
+}
+*tempout = res;
+}
+}
+
+return (outimage);
 }
 
 Image *ShearImage(Image *image, int type, float number) {

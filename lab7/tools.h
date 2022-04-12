@@ -11,6 +11,7 @@
 #include <time.h>
 #include <string.h>
 #include <float.h>
+static int NUM_y = 2, NUM_x = 2;
 
 int cmp(const void *a, const void *b);
 void fft_shift(struct _complex *src, int height, int width);

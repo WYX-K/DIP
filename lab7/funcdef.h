@@ -18,6 +18,15 @@
 
 /**
  * @description: Add zero padding
+ * @param {int} *image - Image Pointer
+ * @param {int} height - Height of Rectangle
+ * @param {int} width - Width of Rectangle
+ * @return {Image} Image Pointer
+ */
+Image *RectNotchBandrejectImage(Image *image, int Rectheight, int Rectwidth);
+
+/**
+ * @description: Add zero padding
  * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
@@ -26,16 +35,20 @@ Image *FFTImage(Image *image);
 /**
  * @description: Add zero padding
  * @param {Image} *image - Image Pointer
+ * @param {int} height - Height
+ * @param {int} width - Width
  * @return {Image} Image Pointer
  */
-Image *ZeroPadding(Image *image);
+Image *ZeroPadding(Image *image, int height, int width);
 
 /**
  * @description: Remove zero padding
  * @param {Image} *image - Image Pointer
+ * @param {int} height - Height
+ * @param {int} width - Width
  * @return {Image} Image Pointer
  */
-Image *RemoveZeros(Image *image);
+Image *RemoveZeros(Image *image, int height, int width);
 
 /**
  * @description: Use adaptive median filter to get the image
@@ -69,11 +82,12 @@ Image *GeoFilterImage(Image *image, int number1, int number2);
 /**
  * @description: Use Bandreject to get the image
  * @param {Image} *image - Image Pointer
- * @param {float} w - Bandwidth
- * @param {float} c - Cut-off frequency
+ * @param {float} d0 - radius
+ * @param {int} x - x axios
+ * @param {int} y - y axios
  * @return {Image} Image Pointer
  */
-Image *BandrejectImage(Image *image, float w, float c);
+Image *IDealNotchBandrejectImage(Image *image, float d0, int x, int y);
 
 /**
  * @description: Use Add Sin Noise to get the image
