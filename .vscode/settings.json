@@ -9,7 +9,9 @@
     "malloc.h": "c",
     "math.h": "c",
     "string.h": "c",
-    "cmath": "cpp"
+    "cmath": "cpp",
+    "limits": "cpp",
+    "type_traits": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

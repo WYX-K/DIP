@@ -1,3 +1,268 @@
+Image *NotOverlapPartImage(Image *image) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Image *tempimage1;
+    Image *tempimage2;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#NotOverlapPart Image");
+    tempimage1 = OverlapPartImage(image);
+    printf("OverlapPartImage\n");
+    tempimage2 = ConnBorderImage(image);
+    printf("ConnBorderImage\n");
+    unsigned char *tempin = image->data;
+    unsigned char *temp1 = tempimage1->data;
+    unsigned char *temp2 = tempimage2->data;
+    unsigned char *tempout = outimage->data;
+    for (int i = 0; i < size; i++) {
+        tempout[i] = tempin[i] - temp1[i] - temp2[i];
+    }
+
+    return outimage;
+}
+
+Image *OverlapPartImage(Image *image) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Pixel *pixel = (Pixel *)malloc(sizeof(Pixel) * size);
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#OverlapPart Image");
+    outimage = ConnBorderImage(image);
+    unsigned char *tempin = image->data;
+    unsigned char *tempout = outimage->data;
+    for (int i = 0; i < size; i++) {
+        tempout[i] = tempin[i] - tempout[i];
+    }
+
+    unsigned char *A = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memcpy(A, tempout, size);
+    unsigned char *X1 = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memset(X1, 0, sizeof(unsigned char) * size);
+    unsigned char *X2 = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memset(X2, 0, sizeof(unsigned char) * size);
+    unsigned char *B = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memset(B, 0, sizeof(unsigned char) * size);
+    int *num = (int *)malloc(sizeof(int) * size);
+    memset(num, 0, sizeof(int) * size);
+    int n = 400;
+    int count = 0;
+    while (find(A, 255, pixel, height, width)) {
+        X1[pixel[0].y * width + pixel[0].x] = 255;
+        while (1) {
+            unsigned char *Xp1 = (unsigned char *)malloc(sizeof(unsigned char) * size);
+            memcpy(Xp1, X1, size);
+            X1 = Dilation(X1, height, width, 0);
+            for (int i = 0; i < size; i++) {
+                if (X1[i] > A[i]) {
+                    X1[i] = A[i];
+                }
+            }
+            if (memcmp(Xp1, X1, size) == 0) {
+                break;
+            }
+            free(Xp1);
+        }
+        num[count] = find(X1, 255, pixel, height, width);
+        if (num[count] > n) {
+            for (int i = 0; i < size; i++) {
+                if (X2[i] < X1[i]) {
+                    X2[i] = X1[i];
+                }
+            }
+        }
+        count++;
+        for (int i = 0; i < size; i++) {
+            if (B[i] < X1[i]) {
+                B[i] = X1[i];
+            }
+        }
+        memset(X1, 0, sizeof(unsigned char) * size);
+        for (int i = 0; i < size; i++) {
+            A[i] -= B[i];
+            if (A[i] < 100) {
+                A[i] = 0;
+            }
+        }
+    }
+    for (int i = 0; i < size; i++) {
+        tempout[i] = X2[i];
+    }
+
+    free(pixel);
+    free(A);
+    free(X1);
+    free(B);
+    free(X2);
+    free(num);
+    return outimage;
+}
+
+Image *ConnBorderImage(Image *image) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#ConnBorder Image");
+    unsigned char *tempin = image->data;
+    unsigned char *tempout = outimage->data;
+    unsigned char *B = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memset(B, 0, sizeof(unsigned char) * size);
+
+    B[0] = 255;
+    while (1) {
+        unsigned char *Xp1 = (unsigned char *)malloc(sizeof(unsigned char) * size);
+        memcpy(Xp1, B, size);
+        B = Dilation(B, height, width, 1);
+        for (int i = 0; i < size; i++) {
+            if (B[i] > tempin[i]) {
+                B[i] = tempin[i];
+            }
+        }
+        if (memcmp(Xp1, B, size) == 0) {
+            break;
+        }
+        free(Xp1);
+    }
+    for (int i = 0; i < size; i++) {
+        tempout[i] = B[i];
+    }
+    free(B);
+
+    return outimage;
+}
+
+void CountConnPixel(Image *image, char *output) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Pixel *pixel = (Pixel *)malloc(sizeof(Pixel) * size);
+    unsigned char *A = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memcpy(A, image->data, size);
+    unsigned char *X1 = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memset(X1, 0, sizeof(unsigned char) * size);
+    unsigned char *B = (unsigned char *)malloc(sizeof(unsigned char) * size);
+    memset(B, 0, sizeof(unsigned char) * size);
+    int *num = (int *)malloc(sizeof(int) * size);
+    memset(num, 0, sizeof(int) * size);
+
+    int count = 0;
+    FILE *fp = fopen(output, "w");
+
+    while (find(A, 255, pixel, height, width)) {
+        X1[pixel[0].y * width + pixel[0].x] = 255;
+        while (1) {
+            unsigned char *Xp1 = (unsigned char *)malloc(sizeof(unsigned char) * size);
+            memcpy(Xp1, X1, size);
+            X1 = Dilation(X1, height, width, 0);
+            for (int i = 0; i < size; i++) {
+                if (X1[i] > A[i]) {
+                    X1[i] = A[i];
+                }
+            }
+            if (memcmp(Xp1, X1, size) == 0) {
+                break;
+            }
+            free(Xp1);
+        }
+        num[count] = find(X1, 255, pixel, height, width);
+        fprintf(fp, "The number of %d th is %d\n", count, num[count]);
+        for (int i = 0; i < size; i++) {
+            if (B[i] < X1[i]) {
+                B[i] = X1[i];
+            }
+        }
+        memset(X1, 0, sizeof(unsigned char) * size);
+        for (int i = 0; i < size; i++) {
+            A[i] -= B[i];
+            if (A[i] < 100) {
+                A[i] = 0;
+            }
+        }
+        count++;
+    }
+    free(pixel);
+    free(A);
+    free(X1);
+    free(B);
+    free(num);
+    fclose(fp);
+    printf("Finshed!\n");
+}
+
+Image *ExtractBoundariesImage(Image *image) {
+    Image *outimage;
+    outimage = ErosionImage(image);
+    int size = image->Height * image->Width;
+
+    for (int i = 0; i < size; i++) {
+        outimage->data[i] = image->data[i] - outimage->data[i];
+    }
+
+    return outimage;
+}
+
+Image *CloseImage(Image *image) {
+    Image *outimage;
+    outimage = DilationImage(image);
+    outimage = ErosionImage(outimage);
+    return outimage;
+}
+
+Image *OpenImage(Image *image) {
+    Image *outimage;
+    outimage = ErosionImage(image);
+    outimage = DilationImage(outimage);
+    return outimage;
+}
+
+Image *ErosionImage(Image *image) {
+    int height = image->Height;
+    int width = image->Width;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#Erosion Image");
+    unsigned char *tempin = image->data;
+    unsigned char *tempout = outimage->data;
+    int *matrix = (int *)malloc(sizeof(int) * height * width);
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            matrix[i * width + j] = tempin[i * width + j];
+        }
+    }
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            if (i == 0 || j == 0 || i == height - 1 || j == width - 1) {
+                matrix[i * width + j] = tempin[i * width + j];
+            } else {
+                int min = 255;
+                for (int k = -1; k <= 1; k++) {
+                    for (int l = -1; l <= 1; l++) {
+                        if (tempin[(i + k) * width + j + l] < min) {
+                            min = tempin[(i + k) * width + j + l];
+                        }
+                    }
+                }
+                matrix[i * width + j] = min;
+            }
+        }
+    }
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            tempout[i * width + j] = matrix[i * width + j];
+        }
+    }
+    free(matrix);
+    return outimage;
+}
+
+Image *DilationImage(Image *image) {
+    int height = image->Height;
+    int width = image->Width;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#Dilation Image");
+    unsigned char *tempin = image->data;
+
+    outimage->data = Dilation(tempin, height, width, 0);
+    return outimage;
+}
+
 Image *RectNotchBandrejectImage(Image *image, int Rectheight, int Rectwidth) {
     Image *outimage;
 
