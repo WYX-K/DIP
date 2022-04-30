@@ -1,4 +1,191 @@
-Image *CannyEdgeImage(Image *image, int sigema) {
+Image *GlobalThresholdingImage(Image *image) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#GlobalThresholding Image");
+    unsigned char *tempin = image->data;
+    unsigned char *tempout = outimage->data;
+
+    int min = 255;
+    int max = 0;
+    for (int i = 0; i < size; i++) {
+        if (tempin[i] > max) {
+            max = tempin[i];
+        }
+        if (tempin[i] < min) {
+            min = tempin[i];
+        }
+    }
+
+    float threshold = (max + min) / 2.0;
+
+    int *G1 = (int *)malloc(sizeof(int) * size);
+    memset(G1, 0, sizeof(int) * size);
+    int *G2 = (int *)malloc(sizeof(int) * size);
+    memset(G2, 0, sizeof(int) * size);
+    int *pos = (int *)malloc(sizeof(int) * size);
+    memset(pos, 0, sizeof(int) * size);
+
+    while (1) {
+        int m = 0, n = 0;
+        for (int i = 0; i < size; i++) {
+            if (tempin[i] < threshold) {
+                G1[m] = tempin[i];
+                m++;
+            } else {
+                G2[n] = tempin[i];
+                pos[i] = tempin[i];
+                n++;
+            }
+        }
+
+        int m1 = 0, m2 = 0;
+        for (int i = 0; i < m; i++) {
+            m1 += G1[i];
+        }
+        m1 /= m;
+
+        for (int i = 0; i < n; i++) {
+            m2 += G2[i];
+        }
+        m2 /= n;
+
+        float temp = (m1 + m2) / 2.0;
+        if (abs(temp - threshold) < 1) {
+            break;
+        } else {
+            threshold = temp;
+            memset(G1, 0, sizeof(int) * size);
+            memset(G2, 0, sizeof(int) * size);
+            memset(pos, 0, sizeof(int) * size);
+        }
+    }
+    printf("threshold: %f\n", threshold);
+
+    for (int i = 0; i < size; i++) {
+        tempout[i] = pos[i];
+    }
+
+    free(G1);
+    free(G2);
+    free(pos);
+
+    return outimage;
+}
+
+Image *LoGEdgeImage(Image *image, float sigma) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#LoGEdge Image");
+    unsigned char *tempin = image->data;
+    unsigned char *tempout = outimage->data;
+
+    int gsize = 0;
+    while (1) {
+        if (gsize > 6 * sigma) {
+            break;
+        }
+        gsize++;
+    }
+
+    double gaussian[gsize * gsize];
+
+    int k = (gsize - 1) / 2;
+    for (int i = 0; i < gsize; i++) {
+        for (int j = 0; j < gsize; j++) {
+            double e = -(double)(pow((i - k - 1), 2) + pow((j - k - 1), 2)) / (2 * sigma * sigma);
+            gaussian[i * gsize + j] = (double)1 / (2 * PI * sigma * sigma) * exp(e);
+        }
+    }
+    int *temp1 = (int *)malloc(sizeof(int) * size);
+    int *temp2 = (int *)malloc(sizeof(int) * size);
+
+    for (int i = k; i < height - k; i++) {
+        for (int j = k; j < width - k; j++) {
+            double sum = 0;
+            for (int m = 0; m < gsize; m++) {
+                for (int n = 0; n < gsize; n++) {
+                    int x = i + m - k;
+                    int y = j + n - k;
+                    sum += tempin[x * width + y] * gaussian[m * gsize + n];
+                }
+            }
+            temp1[i * width + j] = sum;
+        }
+    }
+
+    int lpls[3][3] = {
+        {1, 1, 1},
+        {1, -8, 1},
+        {1, 1, 1}};
+
+    for (int i = 1; i < height - 1; i++) {
+        for (int j = 1; j < width - 1; j++) {
+            double sum = 0;
+            for (int m = 0; m < 3; m++) {
+                for (int n = 0; n < 3; n++) {
+                    int x = i + m - 1;
+                    int y = j + n - 1;
+                    sum += temp1[x * width + y] * lpls[m][n];
+                }
+            }
+            temp2[i * width + j] = sum;
+        }
+    }
+
+    int max = 0;
+
+    for (int i = 0; i < size; i++) {
+        if (temp2[i] > max) {
+            max = temp2[i];
+        }
+    }
+
+    double threshold = max * 0.04;
+
+    for (int i = 1; i < height - 1; i++) {
+        for (int j = 1; j < width - 1; j++) {
+            int p1 = (i - 1) * width + (j - 1);
+            int p2 = (i - 1) * width + j;
+            int p3 = (i - 1) * width + (j + 1);
+            int p4 = i * width + (j - 1);
+            int p5 = i * width + j;
+            int p6 = i * width + (j + 1);
+            int p7 = (i + 1) * width + (j - 1);
+            int p8 = (i + 1) * width + j;
+            int p9 = (i + 1) * width + (j + 1);
+
+            if (temp2[p1] > 0 && temp2[p9] < 0 || temp2[p1] < 0 && temp2[p9] > 0
+                || temp2[p2] > 0 && temp2[p8] < 0 || temp2[p2] < 0 && temp2[p8] > 0
+                || temp2[p3] > 0 && temp2[p7] < 0 || temp2[p3] < 0 && temp2[p7] > 0
+                || temp2[p4] > 0 && temp2[p6] < 0 || temp2[p4] < 0 && temp2[p6] > 0) {
+                if (temp2[p5] < threshold) {
+                    tempout[p5] = temp2[p5];
+                } else {
+                    int a = abs(temp2[p1] - temp2[p9]);
+                    int b = abs(temp2[p2] - temp2[p8]);
+                    int c = abs(temp2[p3] - temp2[p7]);
+                    int d = abs(temp2[p4] - temp2[p6]);
+                    if (a > threshold || b > threshold || c > threshold || d > threshold) {
+                        tempout[p5] = temp2[p5];
+                    } else {
+                        tempout[p5] = 0;
+                    }
+                }
+            } else {
+                tempout[p5] = 0;
+            }
+        }
+    }
+
+    free(temp1);
+    free(temp2);
+
+    return outimage;
+}
+
+Image *CannyEdgeImage(Image *image, float sigma) {
     int height = image->Height;
     int width = image->Width;
     int size = height * width;
@@ -6,10 +193,35 @@ Image *CannyEdgeImage(Image *image, int sigema) {
     unsigned char *tempin = image->data;
     unsigned char *tempout = outimage->data;
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            double n = -(x * x + y * y) / (2 * sigma * sigma);
-            tempout[i * width + j] = tempin[i * width + j] * exp(n);
+    int gsize = 0;
+    while (1) {
+        if (gsize > 6 * sigma) {
+            break;
+        }
+        gsize++;
+    }
+
+    double gaussian[gsize * gsize];
+
+    int k = (gsize - 1) / 2;
+    for (int i = 0; i < gsize; i++) {
+        for (int j = 0; j < gsize; j++) {
+            double e = -(double)(pow((i - k - 1), 2) + pow((j - k - 1), 2)) / (2 * sigma * sigma);
+            gaussian[i * gsize + j] = (double)1 / (2 * PI * sigma * sigma) * exp(e);
+        }
+    }
+
+    for (int i = k; i < height - k; i++) {
+        for (int j = k; j < width - k; j++) {
+            double sum = 0;
+            for (int m = 0; m < gsize; m++) {
+                for (int n = 0; n < gsize; n++) {
+                    int x = i + m - k;
+                    int y = j + n - k;
+                    sum += tempin[x * width + y] * gaussian[m * gsize + n];
+                }
+            }
+            tempout[i * width + j] = sum;
         }
     }
 
@@ -34,56 +246,120 @@ Image *CannyEdgeImage(Image *image, int sigema) {
             sum1 = sum1 > 255 ? 255 : sum1;
             sum2 = sum2 > 255 ? 255 : sum2;
             Ms[i * width + j] = sqrt(pow(sum1, 2) + pow(sum2, 2));
-            A[i * width + j] = atan2(sum2, sum1);
-            // double angle = A[i * width + j] * 180 / PI;
-            // double k = Ms[i * width + j];
-            // if (angle > -22.5 && angle < 22.5 || angle < 157.5 && angle > -157.5) {
-            //     if (k < Ms[(i - 1) * width + j] || k < Ms[(i + 1) * width + j]) {
-            //         g[i * width + j] = 0;
-            //     } else {
-            //         g[i * width + j] = k;
-            //     }
-            // } else if (angle > 67.5 && angle < 112.5 || angle < -67.5 && angle > -112.5) {
-            //     if (k < Ms[i * width + j - 1] || k < Ms[i * width + j + 1]) {
-            //         g[i * width + j] = 0;
-            //     } else {
-            //         g[i * width + j] = k;
-            //     }
-            // } else if (angle < 157.5 && angle > 112.5 || angle > -22.5 && angle < -67.5) {
-            //     if (k < Ms[(i - 1) * width + j + 1] || k < Ms[(i + 1) * width + j - 1]) {
-            //         g[i * width + j] = 0;
-            //     } else {
-            //         g[i * width + j] = k;
-            //     }
-            // } else {
-            //     if (k < Ms[(i - 1) * width + j - 1] || k < Ms[(i + 1) * width + j + 1]) {
-            //         g[i * width + j] = 0;
-            //     } else {
-            //         g[i * width + j] = k;
-            //     }
-            // }
-            // double *gh = (double *)malloc(sizeof(double) * size);
-            // double *gl = (double *)malloc(sizeof(double) * size);
-            // if (g[i * width + j] > 125) {
-            //     gh[i * width + j] = g[i * width + j];
-            // } else {
-            //     gh[i * width + j] = 0;
-            // }
-            // if (g[i * width + j] > 50) {
-            //     gl[i * width + j] = g[i * width + j];
-            // } else {
-            //     gl[i * width + j] = 0;
-            // }
-            // gl[i * width + j] -= gh[i * width + j];
+            A[i * width + j] = atan2(sum2, sum1) * 180 / PI;
         }
     }
 
     double *g = (double *)malloc(sizeof(double) * size);
     memset(g, 0, sizeof(double) * size);
+    double *gh = (double *)malloc(sizeof(double) * size);
+    memset(gh, 0, sizeof(double) * size);
+    double *gl = (double *)malloc(sizeof(double) * size);
+    memset(gl, 0, sizeof(double) * size);
+    double *temp = (double *)malloc(sizeof(double) * size);
+    memset(gl, 0, sizeof(double) * size);
+    int Th = 60, Tl = 30;
     for (int i = 1; i < height - 1; i++) {
         for (int j = 1; j < width - 1; j++) {
+            double angle = A[i * width + j];
+            double ms = Ms[i * width + j];
+            if (angle > -22.5 && angle < 22.5 || angle < 157.5 && angle > -157.5) {
+                if (ms < Ms[(i - 1) * width + j] || ms < Ms[(i + 1) * width + j]) {
+                    g[i * width + j] = 0;
+                } else {
+                    g[i * width + j] = ms;
+                }
+            } else if (angle > 67.5 && angle < 112.5 || angle < -67.5 && angle > -112.5) {
+                if (ms < Ms[i * width + j - 1] || ms < Ms[i * width + j + 1]) {
+                    g[i * width + j] = 0;
+                } else {
+                    g[i * width + j] = ms;
+                }
+            } else if (angle < 157.5 && angle > 112.5 || angle > -22.5 && angle < -67.5) {
+                if (ms < Ms[(i - 1) * width + j + 1] || ms < Ms[(i + 1) * width + j - 1]) {
+                    g[i * width + j] = 0;
+                } else {
+                    g[i * width + j] = ms;
+                }
+            } else {
+                if (ms < Ms[(i - 1) * width + j - 1] || ms < Ms[(i + 1) * width + j + 1]) {
+                    g[i * width + j] = 0;
+                } else {
+                    g[i * width + j] = ms;
+                }
+            }
+            if (g[i * width + j] > Tl) {
+                gl[i * width + j] = 1;
+                temp[i * width + j] = g[i * width + j];
+            } else {
+                gl[i * width + j] = 0;
+            }
+            if (g[i * width + j] > Th) {
+                gh[i * width + j] = 1;
+                temp[i * width + j] = g[i * width + j];
+            } else {
+                gh[i * width + j] = 0;
+            }
+            gl[i * width + j] -= gh[i * width + j];
         }
     }
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            int p5 = i * width + j;
+            if (gh[p5] == 1) {
+                int p1 = (i - 1) * width + (j - 1);
+                int p2 = (i - 1) * width + j;
+                int p3 = (i - 1) * width + (j + 1);
+                int p4 = i * width + (j - 1);
+                int p6 = i * width + (j + 1);
+                int p7 = (i + 1) * width + (j - 1);
+                int p8 = (i + 1) * width + j;
+                int p9 = (i + 1) * width + (j + 1);
+                if (gl[p1] == 1) {
+                    gl[p1] = 1.5;
+                }
+                if (gl[p2] == 1) {
+                    gl[p2] = 1.5;
+                }
+                if (gl[p3] == 1) {
+                    gl[p3] = 1.5;
+                }
+                if (gl[p4] == 1) {
+                    gl[p4] = 1.5;
+                }
+                if (gl[p5] == 1) {
+                    gl[p4] = 1.5;
+                }
+                if (gl[p6] == 1) {
+                    gl[p6] = 1.5;
+                }
+                if (gl[p7] == 1) {
+                    gl[p7] = 1.5;
+                }
+                if (gl[p8] == 1) {
+                    gl[p8] = 1.5;
+                }
+                if (gl[p9] == 1) {
+                    gl[p9] = 1.5;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < size; i++) {
+        if (gl[i] != 1.5 && gh[i] != 1) {
+            temp[i] = 0;
+        }
+        outimage->data[i] = temp[i];
+    }
+
+    free(g);
+    free(gh);
+    free(gl);
+    free(temp);
+    free(Ms);
+    free(A);
 
     return outimage;
 }

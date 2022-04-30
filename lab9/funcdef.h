@@ -18,99 +18,115 @@
 #include "proto.h"
 
 /**
- * @description: Canny edge detection
- * @param {int} *image - Image Pointer
+ * @description: Global thresholding
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
-Image *CannyEdgeImage(Image *image, int sigem);
+Image *GlobalThresholdingImage(Image *image);
+
+/**
+ * @description: LoG edge detection
+ * @param {Image} *image - Image Pointer
+ * @param (float) sigma - Sigma
+ * @return {Image} Image Pointer
+ */
+Image *LoGEdgeImage(Image *image, float sigma);
+
+/**
+ * @description: Canny edge detection
+ * @param {Image} *image - Image Pointer
+ * @param {float} sigma - Sigma
+ * @return {Image} Image Pointer
+ */
+Image *CannyEdgeImage(Image *image, float sigma);
 
 /**
  * @description: Soble Gradient Operators
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *SobleGradientImage(Image *image);
 
 /**
  * @description: Prewitt Gradient Operators
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *PrewittGradientImage(Image *image);
 
 /**
  * @description: Roberts Gradient Operators
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *RobertsGradientImage(Image *image);
 
 /**
  * @description: Oot overlapping particles
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *NotOverlapPartImage(Image *image);
 
 /**
  * @description: overlapping particles
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *OverlapPartImage(Image *image);
 
 /**
  * @description: Obtain particles that fuse only with the boundary
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *ConnBorderImage(Image *image);
 
 /**
  * @description: Count the number of pixels in each white connected component
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @param {char*} *output - output filename
  */
 void CountConnPixel(Image *image, char *output);
 
 /**
  * @description: Extract Boundar of Image
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *ExtractBoundariesImage(Image *image);
 
 /**
  * @description: Close of Image
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *CloseImage(Image *image);
 
 /**
  * @description: Open of Image
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *OpenImage(Image *image);
 
 /**
  * @description: Erosion of Image
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *ErosionImage(Image *image);
 
 /**
  * @description: Dilation of Image
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @return {Image} Image Pointer
  */
 Image *DilationImage(Image *image);
 
 /**
  * @description: Add zero padding
- * @param {int} *image - Image Pointer
+ * @param {Image} *image - Image Pointer
  * @param {int} height - Height of Rectangle
  * @param {int} width - Width of Rectangle
  * @return {Image} Image Pointer
