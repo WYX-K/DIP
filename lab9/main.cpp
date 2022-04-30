@@ -13,72 +13,69 @@ int main() {
     Image *outimage;
     char *input, *output;
 
-    // input = (char *)"..\\images\\headCT-Vandy.pgm";
-    // image = ReadPNMImage(input);
+    input = (char *)"..\\images\\headCT-Vandy.pgm";
+    image = ReadPNMImage(input);
 
-    // outimage = LoGEdgeImage(image, 2.55);
-    // output = (char *)"..\\output\\headCT_Vandy_LoGEdge.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = LoGEdgeImage(image, 2.55);
+    output = (char *)"..\\output\\headCT_Vandy_LoGEdge.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = CannyEdgeImage(image, 2.55);
-    // output = (char *)"..\\output\\headCT_Vandy_CannyEdge.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = CannyEdgeImage(image, 2.55);
+    output = (char *)"..\\output\\headCT_Vandy_CannyEdge.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = RobertsGradientImage(image);
-    // output = (char *)"..\\output\\headCT_Vandy_Roberts.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = RobertsGradientImage(image);
+    output = (char *)"..\\output\\headCT_Vandy_Roberts.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = PrewittGradientImage(image);
-    // output = (char *)"..\\output\\headCT_Vandy_Prewitt.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = PrewittGradientImage(image);
+    output = (char *)"..\\output\\headCT_Vandy_Prewitt.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = SobleGradientImage(image);
-    // output = (char *)"..\\output\\headCT_Vandy_Soble.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = SobleGradientImage(image);
+    output = (char *)"..\\output\\headCT_Vandy_Soble.pgm";
+    SavePNMImage(outimage, output);
 
-    // input = (char *)"..\\images\\building_original.pgm";
-    // image = ReadPNMImage(input);
+    input = (char *)"..\\images\\building_original.pgm";
+    image = ReadPNMImage(input);
 
-    // outimage = RobertsGradientImage(image);
-    // output = (char *)"..\\output\\building_original_Roberts.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = RobertsGradientImage(image);
+    output = (char *)"..\\output\\building_original_Roberts.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = PrewittGradientImage(image);
-    // output = (char *)"..\\output\\building_original_Prewitt.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = PrewittGradientImage(image);
+    output = (char *)"..\\output\\building_original_Prewitt.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = SobleGradientImage(image);
-    // output = (char *)"..\\output\\building_original_Soble.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = SobleGradientImage(image);
+    output = (char *)"..\\output\\building_original_Soble.pgm";
+    SavePNMImage(outimage, output);
 
-    // input = (char *)"..\\images\\noisy_fingerprint.pgm";
-    // image = ReadPNMImage(input);
+    input = (char *)"..\\images\\noisy_fingerprint.pgm";
+    image = ReadPNMImage(input);
 
-    // outimage = RobertsGradientImage(image);
-    // output = (char *)"..\\output\\noisy_fingerprint_Roberts.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = RobertsGradientImage(image);
+    output = (char *)"..\\output\\noisy_fingerprint_Roberts.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = PrewittGradientImage(image);
-    // output = (char *)"..\\output\\noisy_fingerprint_Prewitt.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = PrewittGradientImage(image);
+    output = (char *)"..\\output\\noisy_fingerprint_Prewitt.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = SobleGradientImage(image);
-    // output = (char *)"..\\output\\noisy_fingerprint_Soble.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = SobleGradientImage(image);
+    output = (char *)"..\\output\\noisy_fingerprint_Soble.pgm";
+    SavePNMImage(outimage, output);
 
-    // input = (char *)"..\\images\\noisy_fingerprint.pgm";
-    // image = ReadPNMImage(input);
+    outimage = LoGEdgeImage(image, 1.19);
+    output = (char *)"..\\output\\noisy_fingerprint_LoGEdge.pgm";
+    SavePNMImage(outimage, output);
 
-    // outimage = LoGEdgeImage(image, 1.19);
-    // output = (char *)"..\\output\\noisy_fingerprint_LoGEdge.pgm";
-    // SavePNMImage(outimage, output);
+    input = (char *)"..\\images\\noisy_fingerprint.pgm";
+    image = ReadPNMImage(input);
 
-    // input = (char *)"..\\images\\noisy_fingerprint.pgm";
-    // image = ReadPNMImage(input);
-
-    // outimage = LoGEdgeImage(image, 1.19);
-    // output = (char *)"..\\output\\noisy_fingerprint_LoGEdge.pgm";
-    // SavePNMImage(outimage, output);
+    outimage = CannyEdgeImage(image, 1.19);
+    output = (char *)"..\\output\\noisy_fingerprint_CannyEdge.pgm";
+    SavePNMImage(outimage, output);
 
     input = (char *)"..\\images\\polymersomes.pgm";
     image = ReadPNMImage(input);
