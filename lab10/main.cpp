@@ -13,35 +13,35 @@ int main() {
     Image *outimage;
     char *input, *output;
 
-    input = (char *)"..\\images\\large_septagon_gaussian_noise_mean_0_std_50_added.pgm";
-    image = ReadPNMImage(input);
+    // input = (char *)"..\\images\\large_septagon_gaussian_noise_mean_0_std_50_added.pgm";
+    // image = ReadPNMImage(input);
 
-    outimage = OtusThresholdingImage(image);
-    output = (char *)"..\\output\\large_septagon_gaussian_noise_mean_0_std_50_added.pgm";
-    SavePNMImage(outimage, output);
+    // outimage = OtusThresholdingImage(image);
+    // output = (char *)"..\\output\\large_septagon_gaussian_noise_mean_0_std_50_added.pgm";
+    // SavePNMImage(outimage, output);
 
-    outimage = AverFilterImage(image, 5, 5);
-    outimage = OtusThresholdingImage(outimage);
-    output = (char *)"..\\output\\large_septagon_gaussian_noise_mean_0_std_50_added_AverFilter_OtusThresholding.pgm";
-    SavePNMImage(outimage, output);
+    // outimage = AverFilterImage(image, 5, 5);
+    // outimage = OtusThresholdingImage(outimage);
+    // output = (char *)"..\\output\\large_septagon_gaussian_noise_mean_0_std_50_added_AverFilter_OtusThresholding.pgm";
+    // SavePNMImage(outimage, output);
 
-    input = (char *)"..\\images\\septagon_noisy_shaded.pgm";
-    image = ReadPNMImage(input);
+    // input = (char *)"..\\images\\septagon_noisy_shaded.pgm";
+    // image = ReadPNMImage(input);
 
-    outimage = PartialOtusImage(image);
-    output = (char *)"..\\output\\septagon_noisy_shaded_partialOtusThresholding.pgm";
-    SavePNMImage(outimage, output);
+    // outimage = PartialOtusImage(image);
+    // output = (char *)"..\\output\\septagon_noisy_shaded_partialOtusThresholding.pgm";
+    // SavePNMImage(outimage, output);
 
-    outimage = OtusThresholdingImage(image);
-    output = (char *)"..\\output\\septagon_noisy_shaded_OtusThresholding.pgm";
-    SavePNMImage(outimage, output);
+    // outimage = OtusThresholdingImage(image);
+    // output = (char *)"..\\output\\septagon_noisy_shaded_OtusThresholding.pgm";
+    // SavePNMImage(outimage, output);
 
-    input = (char *)"..\\images\\spot_shaded_text_image.pgm";
-    image = ReadPNMImage(input);
+    // input = (char *)"..\\images\\spot_shaded_text_image.pgm";
+    // image = ReadPNMImage(input);
 
-    outimage = MAverThresholdingImage(image);
-    output = (char *)"..\\output\\spot_shaded_text_image_MAver.pgm";
-    SavePNMImage(outimage, output);
+    // outimage = MAverThresholdingImage(image);
+    // output = (char *)"..\\output\\spot_shaded_text_image_MAver.pgm";
+    // SavePNMImage(outimage, output);
 
     input = (char *)"..\\images\\defective_weld.pgm";
     image = ReadPNMImage(input);

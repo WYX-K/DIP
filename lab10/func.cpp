@@ -1,4 +1,72 @@
-Image *RGrowingImage(Image *image) {
+Image *RGrowingImage(Image *image, float threshold) {
+    int height = image->Height;
+    int width = image->Width;
+    int size = height * width;
+    Image *outimage = CreateNewImage(image, height, width, (char *)"#RGrowing Image");
+    unsigned char *tempin = image->data;
+    unsigned char *tempout = outimage->data;
+
+    typedef struct PTS {
+        int pix;
+        int x;
+        int y;
+        int polynum;
+    } PTS;
+
+    stack<PTS> seed;
+    vector<PTS> tempploy;
+    PTS tempt;
+    PTS *pts = new PTS[width * height];
+    vector<vector<PTS>> polys;
+
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            pts[i * width + j].pix = input[i * width + j];
+            pts[i * width + j].x = i;
+            pts[i * width + j].y = j;
+            pts[i * width + j].polynum = -1;
+        }
+    }
+
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            if (pts[i * width + j].pix <= 0)
+                continue;
+            if (pts[i * width + j].polynum > -1)
+                continue;
+            if (seed.empty() == true)
+                seed.push(pts[i * width + j]);
+            while (!seed.empty() == true) {
+                tempt = seed.top();
+                seed.pop();
+                tempploy.push_back(tempt);
+                pts[(int)(tempt.x * width + tempt.y)].polynum = polys.size();
+
+                for (int bufferX = -1; bufferX <= 1; ++bufferX) {
+                    for (int bufferY = -1; bufferY <= 1; ++bufferY) {
+                        if (tempt.x + bufferX < 0 || tempt.x + bufferX >= height || tempt.y + bufferY < 0 || tempt.y + bufferY >= width)
+                            continue;
+                        if (pts[((int)tempt.x + bufferX) * width + ((int)tempt.y + bufferY)].polynum > -1)
+                            continue;
+                        if (abs(pts[((int)tempt.x + bufferX) * width + ((int)tempt.y + bufferY)].pix - tempt.pix) <= threshold) {
+                            seed.push(pts[((int)tempt.x + bufferX) * width + ((int)tempt.y + bufferY)]);
+                            pts[((int)tempt.x + bufferX) * width + ((int)tempt.y + bufferY)].polynum = polys.size();
+                        }
+                    }
+                }
+            }
+            polys.push_back(tempploy);
+            tempploy.clear();
+        }
+    }
+
+    for (int i = 0; i < polys.size(); ++i) {
+        for (int j = 0; j < polys[i].size(); ++j) {
+            output->data[(int)(polys[i][j].x * width + polys[i][j].y)] = polys[i][j].pix;
+        }
+    }
+
+    return outimage;
 }
 
 Image *MAverThresholdingImage(Image *image) {
